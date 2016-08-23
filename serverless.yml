@@ -1,4 +1,4 @@
-service: serverless-checkin
+service: southwest-checkin
 
 provider:
   name: aws
