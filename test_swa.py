@@ -26,7 +26,7 @@ class TestRequest(unittest.TestCase):
             content_type="application/vnd.swacorp.com.mobile.boarding-passes-v1.0+json"
         )
 
-        mock_requests.get.assert_called_with(expected_url, json=fake_data, headers=expected_headers, verify=False)
+        mock_requests.get.assert_called_with(expected_url, params=fake_data, headers=expected_headers, verify=False)
 
     def test_make_request_post(self, mock_requests):
         expected_headers = {
@@ -85,9 +85,9 @@ class TestCheckIn(unittest.TestCase):
     def test_check_in_call(self, mock_make_request):
         swa.check_in(self.event, self.context)
         mock_make_request.assert_called_with(
-                "/reservations/record-locator/B2B8TG/boarding-passes",
-                self.data,
-                "application/vnd.swacorp.com.mobile.boarding-passes-v1.0+json"
+            "/reservations/record-locator/B2B8TG/boarding-passes",
+            self.data,
+            "application/vnd.swacorp.com.mobile.boarding-passes-v1.0+json"
         )
 
     @responses.activate
@@ -106,5 +106,47 @@ class TestCheckIn(unittest.TestCase):
 
 class TestReservation(unittest.TestCase):
 
-    def test_get_reservation(self):
-        pass
+    def setUp(self):
+        self.event = dict(first_name="George", last_name="Bush", confirmation_number="B2B8TG")
+        self.context = "fake context"
+
+    @mock.patch('swa._make_request')
+    def test_get_reservation_call(self, mock_make_request):
+        fake_data = {
+            'action': 'VIEW',
+            'first-name': 'George',
+            'last-name': 'Bush'
+        }
+
+        swa.get_reservation(self.event, self.context)
+        mock_make_request.assert_called_with(
+            "/reservations/record-locator/B2B8TG",
+            fake_data,
+            "application/vnd.swacorp.com.mobile.reservations-v1.0+json",
+            method='get'
+        )
+
+    @responses.activate
+    def test_get_reservation_success(self):
+        fake_response = {
+            'itinerary': {
+                'originationDestinations': [{
+                    'segments': [{
+                        'departureDateTime': '2016-04-16T10:05:00.000-05:00'
+                    }]
+                }]
+            }
+        }
+        expected_message = "confirmation_number=B2B8TG first_name=\"George\" last_name=\"Bush\" " \
+                           "departure_time=2016-04-16T10:05:00.000-05:00"
+        responses.add(
+            responses.GET,
+            'https://api-extensions.southwest.com/v1/mobile/reservations/record-locator/B2B8TG',
+            json=fake_response,
+            status=200
+        )
+
+        result = swa.get_reservation(self.event, self.context)
+
+        assert result['event'] == self.event
+        assert result['message'] == expected_message
