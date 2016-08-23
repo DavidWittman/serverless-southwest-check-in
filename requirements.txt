@@ -1,14 +1,2 @@
-configparser==3.5.0
-cookies==2.2.1
-enum34==1.1.6
-flake8==3.0.4
-funcsigs==1.0.2
-mccabe==0.5.2
-mock==2.0.0
-pbr==1.10.0
-pycodestyle==2.0.0
-pyflakes==1.2.3
 requests==2.11.1
-responses==0.5.1
-six==1.10.0
 wsgiref==0.1.2
