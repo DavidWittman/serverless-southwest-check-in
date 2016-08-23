@@ -9,7 +9,7 @@ class SouthwestAPIError(Exception):
     pass
 
 
-def _make_request(path, data, content_type, check_status_code=True):
+def _make_request(path, data, content_type, method='post', check_status_code=True):
     url = "%s%s" % (BASE_URL, path)
     headers = {
         "User-Agent": USER_AGENT,
@@ -18,7 +18,10 @@ def _make_request(path, data, content_type, check_status_code=True):
         "Accept-Language": "en-US;q=1"
     }
 
-    response = requests.post(url, json=data, headers=headers, verify=False)
+    assert method.lower() in ("post", "get")
+
+    request_fn = getattr(requests, method.lower())
+    response = request_fn(url, json=data, headers=headers, verify=False)
 
     if check_status_code and not response.ok:
         try:

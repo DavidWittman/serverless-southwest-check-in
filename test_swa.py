@@ -6,10 +6,30 @@ import responses
 import swa
 
 
+@mock.patch('swa.requests')
 class TestRequest(unittest.TestCase):
 
-    @mock.patch('swa.requests')
-    def test_make_request_call(self, mock_requests):
+    def test_make_request_get(self, mock_requests):
+        expected_headers = {
+            "User-Agent": "Southwest/3.3.7 (iPhone; iOS 9.3; Scale/2.00)",
+            "Content-Type": "application/vnd.swacorp.com.mobile.boarding-passes-v1.0+json",
+            "X-Api-Key": "l7xx8d8bfce4ee874269bedc02832674129b",
+            "Accept-Language": "en-US;q=1"
+        }
+        expected_url = "https://api-extensions.southwest.com/v1/mobile/foo/123456/bar"
+        fake_data = {}
+
+        _ = swa._make_request(
+            "/foo/123456/bar",
+            fake_data,
+            method='get',
+            content_type="application/vnd.swacorp.com.mobile.boarding-passes-v1.0+json"
+        )
+
+        mock_requests.get.assert_called_with(expected_url, json=fake_data, headers=expected_headers, verify=False)
+
+
+    def test_make_request_post(self, mock_requests):
         expected_headers = {
             "User-Agent": "Southwest/3.3.7 (iPhone; iOS 9.3; Scale/2.00)",
             "Content-Type": "application/vnd.swacorp.com.mobile.boarding-passes-v1.0+json",
@@ -27,6 +47,9 @@ class TestRequest(unittest.TestCase):
 
         mock_requests.post.assert_called_with(expected_url, json=fake_data, headers=expected_headers, verify=False)
 
+    def test_make_request_invalid_method(self, mock_requests):
+        with self.assertRaises(AssertionError):
+            swa._make_request("/foo/123456/bar", {}, "application/json", method="foo")
 
 class TestCheckIn(unittest.TestCase):
 
