@@ -1,3 +1,6 @@
+deploy: clean install_deps
+	serverless deploy
+
 lint:
 	flake8 --max-line-length=120 *.py
 
@@ -12,4 +15,4 @@ clean:
 	-rm -rf vendor/
 	-find . -type f -name '*.pyc' -delete
 
-.PHONY: test lint install_deps clean
+.PHONY: deploy lint test install_deps deploy_lambda clean
