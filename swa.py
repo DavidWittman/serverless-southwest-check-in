@@ -5,11 +5,7 @@ USER_AGENT = "Southwest/3.3.7 (iPhone; iOS 9.3; Scale/2.00)"
 API_KEY = "l7xx8d8bfce4ee874269bedc02832674129b"
 
 
-class ReservationError(Exception):
-    pass
-
-
-class CheckInError(Exception):
+class SouthwestAPIError(Exception):
     pass
 
 
@@ -30,7 +26,7 @@ def _make_request(path, data, content_type, check_status_code=True):
         except:
             msg = response.reason
 
-        raise SouthWestAPIError("status_code=%s msg=\"%s\"" % (response.status_code, msg))
+        raise SouthwestAPIError("status_code=%s msg=\"%s\"" % (response.status_code, msg))
 
     return response
 
