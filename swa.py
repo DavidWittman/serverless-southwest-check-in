@@ -32,10 +32,12 @@ def _make_request(path, data, content_type, check_status_code=True):
 
 # TODO(dw): Create a handler wrapper to accept event/context?
 
+
 def get_reservation(event, context):
     first_name = event['first_name']
     last_name = event['last_name']
     confirmation_number = event['confirmation_number']
+
 
 def check_in(event, context):
     content_type = "application/vnd.swacorp.com.mobile.boarding-passes-v1.0+json"

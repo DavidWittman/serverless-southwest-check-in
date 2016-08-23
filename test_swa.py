@@ -19,9 +19,14 @@ class TestRequest(unittest.TestCase):
         expected_url = "https://api-extensions.southwest.com/v1/mobile/foo/123456/bar"
         fake_data = {}
 
-        _ = swa._make_request("/foo/123456/bar", fake_data, content_type="application/vnd.swacorp.com.mobile.boarding-passes-v1.0+json")
+        _ = swa._make_request(
+            "/foo/123456/bar",
+            fake_data,
+            content_type="application/vnd.swacorp.com.mobile.boarding-passes-v1.0+json"
+        )
 
         mock_requests.post.assert_called_with(expected_url, json=fake_data, headers=expected_headers, verify=False)
+
 
 class TestCheckIn(unittest.TestCase):
 
@@ -39,14 +44,16 @@ class TestCheckIn(unittest.TestCase):
             'maxFailedCheckInAttemptsReached': False,
             'passengerCheckInDocuments': [{
                 'passenger': {
+                    'firstName': 'George',
+                    'lastName': 'Bush'
                  },
                  'checkinDocuments': [{
-                        'boardingGroupNumber': '01',
-                        'boardingGroup': 'A',
-                        'documentType': 'BOARDING_PASS',
-                        'origin': 'AUS',
-                        'destination': 'LAS',
-                        'flightNumber': '4242'
+                     'boardingGroupNumber': '01',
+                     'boardingGroup': 'A',
+                     'documentType': 'BOARDING_PASS',
+                     'origin': 'AUS',
+                     'destination': 'LAS',
+                     'flightNumber': '4242'
                  }]
             }]
         }
@@ -69,7 +76,8 @@ class TestCheckIn(unittest.TestCase):
             status=200
         )
         result = swa.check_in(self.event, self.context)
-        assert result['message'] == "confirmation_number=%s documents=1 emailed=false" % self.event['confirmation_number']
+        assert result['message'] == "confirmation_number=%s documents=1 emailed=false" % \
+            self.event['confirmation_number']
         assert result['event'] == self.event
 
 
