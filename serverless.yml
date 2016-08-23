@@ -9,18 +9,14 @@ provider:
 #  stage: dev
 #  region: us-east-1
 
-# you can add packaging information here
-#package:
-#  include:
-#    - include-me.js
-#  exclude:
-#    - exclude-me.js
-#  artifact: my-service-code.zip
+package:
+  exclude:
+    - env/
 
 functions:
   checkin:
     handler: swa.check_in
-  get_reservation:
+  getreservation:
     handler: swa.get_reservation
 
 #   you can add any of the following events
