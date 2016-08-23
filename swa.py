@@ -1,3 +1,7 @@
+import sys
+
+sys.path.append('./vendor')
+
 import requests
 
 BASE_URL = "https://api-extensions.southwest.com/v1/mobile"
