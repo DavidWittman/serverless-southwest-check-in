@@ -38,13 +38,50 @@ def _make_request(path, data, content_type, method='post', check_status_code=Tru
 
     return response
 
+
+def _pull_reservation(confirmation_number, first, last):
+    """Given a confirmation_number, first and last name, retrieve iternerary for trip."""
+    url = '{}/reservations/record-locator/{}'.format(BASE_URL, confirmation_number)
+    headers = {
+        'Accept-Language': 'en-US;q=1',
+        'Content-Type': 'application/vnd.swacorp.com.mobile.boarding-passes-v1.0+json',
+        'User-Agent': USER_AGENT,
+        'X-Api-Key': API_KEY
+    }
+    # Pass params so they are encoded
+    payload = {
+        'action': 'VIEW',
+        'first-name': first,
+        'last-name': last
+    }
+
+    response = requests.get(url, headers=headers, params=payload)
+    # If request fails try to determine why and raise detailed error
+    if not response.ok:
+        try:
+            msg = response.json()['message']
+        except:
+            msg = response.reason
+
+        raise ReservationError("status_code=%s msg=\"%s\"" % (response.status_code, msg))
+    # The originationDestinationId is the
+    origin_data = response.json().get('itinerary', {}).get('originationDestinations', [{'n': 0}])[0].get('originationDestinationId', None)
+
+    return origin_data
+
 # TODO(dw): Create a handler wrapper to accept event/context?
 
 
 def get_reservation(event, context):
+    """Find detailed origin information from reservation via confirmation number, first and last name."""
     first_name = event['first_name']
     last_name = event['last_name']
     confirmation_number = event['confirmation_number']
+
+    # Call out to get origin_data from reservation
+    origin_data = _pull_reservation(confirmation_number, first_name, last_name)
+
+    return dict(confirmation_number=confirmation_number, first_name=first_name, last_name=last_name, origin_data=origin_data)
 
 
 def check_in(event, context):
