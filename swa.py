@@ -63,7 +63,7 @@ def _pull_reservation(confirmation_number, first, last):
         except:
             msg = response.reason
 
-        raise ReservationError("status_code=%s msg=\"%s\"" % (response.status_code, msg))
+        raise SouthwestAPIError("status_code=%s msg=\"%s\"" % (response.status_code, msg))
     # The originationDestinationId is the
     origin_data = response.json().get('itinerary', {}).get('originationDestinations', [{'n': 0}])[0].get('originationDestinationId', None)
 
@@ -74,9 +74,28 @@ def _pull_reservation(confirmation_number, first, last):
 
 def get_reservation(event, context):
     """Find detailed origin information from reservation via confirmation number, first and last name."""
+    confirmation_number = event['confirmation_number']
+    content_type = 'application/vnd.swacorp.com.mobile.reservations-v1.0+json'
     first_name = event['first_name']
     last_name = event['last_name']
-    confirmation_number = event['confirmation_number']
+
+    data = {
+        'action': 'VIEW',
+        'first-name': first_name,
+        'last-name': last_name
+    }
+
+    response = _make_request('/reservations/record-locator/%s' % confirmation_number,
+                             data,
+                             'reservation',
+                             content_type)
+
+    # The originationDestinationId contains the information about the departure time from origin
+    origin_data = response.json().get('itinerary', {}).get('originationDestinations', [{'n': 0}])[0].get('originationDestinationId', None)
+
+    message = dict(confirmation_number=confirmation_number, first_name=first_name, last_name=last_name, origin_data=origin_data)
+
+    return dict(message=message, event=event)
 
     # Call out to get origin_data from reservation
     origin_data = _pull_reservation(confirmation_number, first_name, last_name)
@@ -99,6 +118,7 @@ def check_in(event, context):
     response = _make_request(
         "/reservations/record-locator/%s/boarding-passes" % confirmation_number,
         data,
+        'check_in',
         content_type
     )
 
