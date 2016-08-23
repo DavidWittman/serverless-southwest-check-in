@@ -1,4 +1,12 @@
+#
+# swa.py
+# Lamba functions for interacting with the Southwest API
+#
+# TODO(dw): Create a handler wrapper to accept event/context?
+#
+
 import sys
+
 
 # Part of our Lambda deployment process installs requirements into ./vendor, so add it to the path
 sys.path.append('./vendor')
@@ -15,6 +23,15 @@ class SouthwestAPIError(Exception):
 
 
 def _make_request(path, data, content_type, method='post', check_status_code=True):
+    """Issue a request to the Southwest API
+
+    :param path: The path to send the request to. This should begin with a '/' and not include the base url.
+    :param data: Data to send to the server in the HTTP request body.
+    :param content_type: Sets the HTTP Content-Type header
+    :param method: HTTP method to use. ('post' or 'get')
+    :param check_status_code: Raise a SouthwestAPIError if a non-success HTTP status code is returned
+    """
+
     url = "%s%s" % (BASE_URL, path)
     headers = {
         "User-Agent": USER_AGENT,
@@ -23,14 +40,17 @@ def _make_request(path, data, content_type, method='post', check_status_code=Tru
         "Accept-Language": "en-US;q=1"
     }
 
-    assert method.lower() in ("post", "get")
+    method = method.lower()
+    assert method in ("post", "get")
 
-    request_fn = getattr(requests, method.lower())
-    response = request_fn(url, json=data, headers=headers, verify=False)
+    if method == "get":
+        response = requests.get(url, params=data, headers=headers, verify=False)
+    elif method == "post":
+        response = requests.post(url, json=data, headers=headers, verify=False)
 
     if check_status_code and not response.ok:
         try:
-            msg = response.json()['message']
+            msg = response.json()["message"]
         except:
             msg = response.reason
 
@@ -39,45 +59,13 @@ def _make_request(path, data, content_type, method='post', check_status_code=Tru
     return response
 
 
-def _pull_reservation(confirmation_number, first, last):
-    """Given a confirmation_number, first and last name, retrieve iternerary for trip."""
-    url = '{}/reservations/record-locator/{}'.format(BASE_URL, confirmation_number)
-    headers = {
-        'Accept-Language': 'en-US;q=1',
-        'Content-Type': 'application/vnd.swacorp.com.mobile.boarding-passes-v1.0+json',
-        'User-Agent': USER_AGENT,
-        'X-Api-Key': API_KEY
-    }
-    # Pass params so they are encoded
-    payload = {
-        'action': 'VIEW',
-        'first-name': first,
-        'last-name': last
-    }
-
-    response = requests.get(url, headers=headers, params=payload)
-    # If request fails try to determine why and raise detailed error
-    if not response.ok:
-        try:
-            msg = response.json()['message']
-        except:
-            msg = response.reason
-
-        raise SouthwestAPIError("status_code=%s msg=\"%s\"" % (response.status_code, msg))
-    # The originationDestinationId is the
-    origin_data = response.json().get('itinerary', {}).get('originationDestinations', [{'n': 0}])[0].get('originationDestinationId', None)
-
-    return origin_data
-
-# TODO(dw): Create a handler wrapper to accept event/context?
-
-
+# TODO(dw): Make this `schedule_check_in`
 def get_reservation(event, context):
     """Find detailed origin information from reservation via confirmation number, first and last name."""
-    confirmation_number = event['confirmation_number']
     content_type = 'application/vnd.swacorp.com.mobile.reservations-v1.0+json'
     first_name = event['first_name']
     last_name = event['last_name']
+    confirmation_number = event['confirmation_number']
 
     data = {
         'action': 'VIEW',
@@ -85,22 +73,20 @@ def get_reservation(event, context):
         'last-name': last_name
     }
 
-    response = _make_request('/reservations/record-locator/%s' % confirmation_number,
-                             data,
-                             'reservation',
-                             content_type)
+    response = _make_request(
+        '/reservations/record-locator/%s' % confirmation_number,
+        data,
+        content_type,
+        method="get"
+    )
 
-    # The originationDestinationId contains the information about the departure time from origin
-    origin_data = response.json().get('itinerary', {}).get('originationDestinations', [{'n': 0}])[0].get('originationDestinationId', None)
+    # TODO(dw): Catch exceptions here and send to failed queue
+    departure_time = response.json()['itinerary']['originationDestinations'][0]["segments"][0]["departureDateTime"]
 
-    message = dict(confirmation_number=confirmation_number, first_name=first_name, last_name=last_name, origin_data=origin_data)
+    message = ("confirmation_number=%s first_name=\"%s\" last_name=\"%s\" departure_time=%s"
+               % (confirmation_number, first_name, last_name, departure_time))
 
     return dict(message=message, event=event)
-
-    # Call out to get origin_data from reservation
-    origin_data = _pull_reservation(confirmation_number, first_name, last_name)
-
-    return dict(confirmation_number=confirmation_number, first_name=first_name, last_name=last_name, origin_data=origin_data)
 
 
 def check_in(event, context):
@@ -118,7 +104,6 @@ def check_in(event, context):
     response = _make_request(
         "/reservations/record-locator/%s/boarding-passes" % confirmation_number,
         data,
-        'check_in',
         content_type
     )
 
