@@ -1,8 +1,9 @@
 import sys
 
+# Part of our Lambda deployment process installs requirements into ./vendor, so add it to the path
 sys.path.append('./vendor')
 
-import requests
+import requests  # NOQA
 
 BASE_URL = "https://api-extensions.southwest.com/v1/mobile"
 USER_AGENT = "Southwest/3.3.7 (iPhone; iOS 9.3; Scale/2.00)"

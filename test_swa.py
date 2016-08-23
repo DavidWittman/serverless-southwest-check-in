@@ -19,7 +19,7 @@ class TestRequest(unittest.TestCase):
         expected_url = "https://api-extensions.southwest.com/v1/mobile/foo/123456/bar"
         fake_data = {}
 
-        _ = swa._make_request(
+        _ = swa._make_request(  # NOQA
             "/foo/123456/bar",
             fake_data,
             method='get',
@@ -27,7 +27,6 @@ class TestRequest(unittest.TestCase):
         )
 
         mock_requests.get.assert_called_with(expected_url, json=fake_data, headers=expected_headers, verify=False)
-
 
     def test_make_request_post(self, mock_requests):
         expected_headers = {
@@ -39,7 +38,7 @@ class TestRequest(unittest.TestCase):
         expected_url = "https://api-extensions.southwest.com/v1/mobile/foo/123456/bar"
         fake_data = {}
 
-        _ = swa._make_request(
+        _ = swa._make_request(  # NOQA
             "/foo/123456/bar",
             fake_data,
             content_type="application/vnd.swacorp.com.mobile.boarding-passes-v1.0+json"
@@ -50,6 +49,7 @@ class TestRequest(unittest.TestCase):
     def test_make_request_invalid_method(self, mock_requests):
         with self.assertRaises(AssertionError):
             swa._make_request("/foo/123456/bar", {}, "application/json", method="foo")
+
 
 class TestCheckIn(unittest.TestCase):
 
@@ -70,14 +70,14 @@ class TestCheckIn(unittest.TestCase):
                     'firstName': 'George',
                     'lastName': 'Bush'
                  },
-                 'checkinDocuments': [{
-                     'boardingGroupNumber': '01',
-                     'boardingGroup': 'A',
-                     'documentType': 'BOARDING_PASS',
-                     'origin': 'AUS',
-                     'destination': 'LAS',
-                     'flightNumber': '4242'
-                 }]
+                'checkinDocuments': [{
+                    'boardingGroupNumber': '01',
+                    'boardingGroup': 'A',
+                    'documentType': 'BOARDING_PASS',
+                    'origin': 'AUS',
+                    'destination': 'LAS',
+                    'flightNumber': '4242'
+                }]
             }]
         }
 
