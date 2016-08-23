@@ -12,6 +12,10 @@ provider:
 package:
   exclude:
     - env/
+    - test_swa.py
+    - Makefile
+    - requirements.txt
+    - reqirements-dev.txt
 
 functions:
   checkin:

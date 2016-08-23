@@ -6,6 +6,7 @@ test:
 
 install_deps:
 	mkdir -p vendor
+	touch vendor/__init__.py
 	pip install -r requirements.txt -t vendor
 
 clean:
