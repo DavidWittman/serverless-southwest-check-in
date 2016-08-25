@@ -6,8 +6,14 @@ import responses
 import swa
 
 
+class LambdaTester(unittest.TestCase):
+    def setUp():
+        self.event = dict(first_name="George", last_name="Bush", confirmation_number="B2B8TG")
+        self.context = "fake context"
+
+
 @mock.patch('swa.requests')
-class TestRequest(unittest.TestCase):
+class TestRequest(LambdaTester):
 
     def test_make_request_get(self, mock_requests):
         expected_headers = {
@@ -51,11 +57,9 @@ class TestRequest(unittest.TestCase):
             swa._make_request("/foo/123456/bar", {}, "application/json", method="foo")
 
 
-class TestCheckIn(unittest.TestCase):
+class TestCheckIn(LambdaTester):
 
     def setUp(self):
-        self.event = dict(first_name="George", last_name="Bush", confirmation_number="B2B8TG")
-        self.context = "fake context"
         self.data = {
             'names': [{
                 'firstName': 'George',
@@ -104,7 +108,12 @@ class TestCheckIn(unittest.TestCase):
         assert result['event'] == self.event
 
 
-class TestReservation(unittest.TestCase):
+class TestScheduleCheckIn(LambdaTester):
+
+    def test_schedule_check_in_(self):
+        swa.schedule_check_in(self.event, self.context)
+
+class TestReservation(LambdaTester):
 
     def setUp(self):
         self.event = dict(first_name="George", last_name="Bush", confirmation_number="B2B8TG")
