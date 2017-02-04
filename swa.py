@@ -7,11 +7,14 @@
 
 import sys
 
-
 # Part of our Lambda deployment process installs requirements into ./vendor, so add it to the path
 sys.path.append('./vendor')
 
+import boto3     # NOQA
 import requests  # NOQA
+
+events_client = boto3.client('events')
+lambda_client = boto3.client('lambda')
 
 BASE_URL = "https://api-extensions.southwest.com/v1/mobile"
 USER_AGENT = "Southwest/3.3.7 (iPhone; iOS 9.3; Scale/2.00)"
@@ -57,6 +60,10 @@ def _make_request(path, data, content_type, method='post', check_status_code=Tru
         raise SouthwestAPIError("status_code=%s msg=\"%s\"" % (response.status_code, msg))
 
     return response
+
+
+def schedule_check_in(event, context):
+    pass
 
 
 # TODO(dw): Make this `schedule_check_in`

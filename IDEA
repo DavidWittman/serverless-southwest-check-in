@@ -1,0 +1,15 @@
+# Functions
+
+ 1. Add reservation
+
+  - Receives first, last, and confirmation number
+  - Looks up reservation from Southwest API
+  - Adds reservation to DynamoDB
+
+ 2. Scheduled task to lookup check-ins (every 5 min)
+
+  - Query DynamoDB for upcoming reservations
+  - Call check-in function via SQS/SNS
+
+ 3. Check in
+  - Check in to flights via Southwest API

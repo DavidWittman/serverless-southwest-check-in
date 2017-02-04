@@ -7,7 +7,7 @@ import swa
 
 
 class LambdaTester(unittest.TestCase):
-    def setUp():
+    def setUp(self):
         self.event = dict(first_name="George", last_name="Bush", confirmation_number="B2B8TG")
         self.context = "fake context"
 
@@ -60,6 +60,7 @@ class TestRequest(LambdaTester):
 class TestCheckIn(LambdaTester):
 
     def setUp(self):
+        super(TestCheckIn, self).setUp()
         self.data = {
             'names': [{
                 'firstName': 'George',
@@ -108,16 +109,7 @@ class TestCheckIn(LambdaTester):
         assert result['event'] == self.event
 
 
-class TestScheduleCheckIn(LambdaTester):
-
-    def test_schedule_check_in_(self):
-        swa.schedule_check_in(self.event, self.context)
-
 class TestReservation(LambdaTester):
-
-    def setUp(self):
-        self.event = dict(first_name="George", last_name="Bush", confirmation_number="B2B8TG")
-        self.context = "fake context"
 
     @mock.patch('swa._make_request')
     def test_get_reservation_call(self, mock_make_request):
