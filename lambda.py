@@ -34,6 +34,28 @@ def _get_minute_timestamp(dt):
     return int(time.mktime(minute.timetuple()))
 
 
+def _get_check_in_time(departure_time):
+    """
+    Receives a departure time in the format
+
+        2017-02-09T07:50:00.000-06:00
+
+    And returns the check in time (24 hours prior) as a unix timestamp
+    """
+    # TODO(dw):
+    return departure_time
+
+
+def _get_check_in_times_from_reservation(reservation):
+    """
+    """
+    flights = reservation['itinerary']['originationDestinations']
+    return [
+        _get_check_in_time(segment['departureDateTime']) for flight in flights
+        for segment in flight['segments']
+    ]
+
+
 def add(event, context):
     """
     Looks up a reservation and adds check in times to DynamoDB
@@ -42,9 +64,12 @@ def add(event, context):
     last_name = event['last_name']
     confirmation_number = event['confirmation_number']
 
-    itinerary = swa.get_itinerary(first_name, last_name, confirmation_number)
-    # TODO(dw): Fetch departure times from itinerary, convert to dt object,
-    # round to nearest minute, subtract 24 hours, then add to DynamoDB
+    reservation = swa.get_reservation(first_name, last_name, confirmation_number)
+    check_in_times = _get_check_in_times_from_reservation(reservation)
+
+    for c in check_in_times:
+        # Add to dynamodb
+        pass
 
 
 def check_in(event, context):
@@ -59,3 +84,4 @@ def check_in(event, context):
 
     for reservation in response['Items']:
         # Check in!
+        pass

@@ -52,7 +52,7 @@ def _make_request(path, data, content_type, method='post', check_status_code=Tru
     return response
 
 
-def get_itinerary(first_name, last_name, confirmation_number):
+def get_reservation(first_name, last_name, confirmation_number):
     """
     Find detailed origin information from reservation via confirmation number,
     first and last name
@@ -73,9 +73,9 @@ def get_itinerary(first_name, last_name, confirmation_number):
     )
 
     # TODO(dw): Catch exceptions here and send to failed queue
-    itinerary = response.json()
+    reservation = response.json()
 
-    return itinerary
+    return reservation
 
 
 def check_in(first_name, last_name, confirmation_number):
