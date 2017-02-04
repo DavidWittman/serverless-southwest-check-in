@@ -1,20 +1,9 @@
 #
 # swa.py
-# Lamba functions for interacting with the Southwest API
-#
-# TODO(dw): Create a handler wrapper to accept event/context?
+# Functions for interacting with the Southwest API
 #
 
-import sys
-
-# Part of our Lambda deployment process installs requirements into ./vendor, so add it to the path
-sys.path.append('./vendor')
-
-import boto3     # NOQA
-import requests  # NOQA
-
-events_client = boto3.client('events')
-lambda_client = boto3.client('lambda')
+import requests
 
 BASE_URL = "https://api-extensions.southwest.com/v1/mobile"
 USER_AGENT = "Southwest/3.3.7 (iPhone; iOS 9.3; Scale/2.00)"
@@ -26,7 +15,8 @@ class SouthwestAPIError(Exception):
 
 
 def _make_request(path, data, content_type, method='post', check_status_code=True):
-    """Issue a request to the Southwest API
+    """
+    Issue a request to the Southwest API
 
     :param path: The path to send the request to. This should begin with a '/' and not include the base url.
     :param data: Data to send to the server in the HTTP request body.
@@ -62,17 +52,12 @@ def _make_request(path, data, content_type, method='post', check_status_code=Tru
     return response
 
 
-def schedule_check_in(event, context):
-    pass
-
-
-# TODO(dw): Make this `schedule_check_in`
-def get_reservation(event, context):
-    """Find detailed origin information from reservation via confirmation number, first and last name."""
+def get_itinerary(first_name, last_name, confirmation_number):
+    """
+    Find detailed origin information from reservation via confirmation number,
+    first and last name
+    """
     content_type = 'application/vnd.swacorp.com.mobile.reservations-v1.0+json'
-    first_name = event['first_name']
-    last_name = event['last_name']
-    confirmation_number = event['confirmation_number']
 
     data = {
         'action': 'VIEW',
@@ -88,19 +73,14 @@ def get_reservation(event, context):
     )
 
     # TODO(dw): Catch exceptions here and send to failed queue
-    departure_time = response.json()['itinerary']['originationDestinations'][0]["segments"][0]["departureDateTime"]
+    itinerary = response.json()
 
-    message = ("confirmation_number=%s first_name=\"%s\" last_name=\"%s\" departure_time=%s"
-               % (confirmation_number, first_name, last_name, departure_time))
-
-    return dict(message=message, event=event)
+    return itinerary
 
 
-def check_in(event, context):
+def check_in(first_name, last_name, confirmation_number):
     content_type = "application/vnd.swacorp.com.mobile.boarding-passes-v1.0+json"
-    first_name = event['first_name']
-    last_name = event['last_name']
-    confirmation_number = event['confirmation_number']
+
     data = {
         'names': [{
             'firstName': first_name,
@@ -114,7 +94,7 @@ def check_in(event, context):
         content_type
     )
 
-    check_in_docs = response.json()['passengerCheckInDocuments'][0]['checkinDocuments']
+    # TODO(dw): error handling
+    check_in_docs = response.json()
 
-    message = "confirmation_number=%s documents=%s emailed=false" % (confirmation_number, len(check_in_docs))
-    return dict(message=message, event=event)
+    return check_in_docs

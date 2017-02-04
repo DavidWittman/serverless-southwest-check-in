@@ -3,11 +3,18 @@ service: southwest-checkin
 provider:
   name: aws
   runtime: python2.7
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+      Resource: "arn:aws:dynamodb:*:*:*"
 
-# you can overwrite defaults here
-#defaults:
-#  stage: dev
-#  region: us-east-1
+values:
+  dynamodbTableName: southwest-reservations
 
 package:
   exclude:
@@ -18,29 +25,38 @@ package:
     - reqirements-dev.txt
 
 functions:
-  checkin:
-    handler: swa.check_in
-    memorySize: 128
-  getreservation:
-    handler: swa.get_reservation
+  add:
+    handler: lambda.add
+    description: look up a reservation and add it to dynamodb
+    environment:
+      DYNAMO_TABLE_NAME: ${self:values.dynamodbTableName}
+  check_in:
+    handler: lambda.check_in
+    description: find reservations to check-in and queue check-in jobs
+    environment:
+      DYNAMO_TABLE_NAME: ${self:values.dynamodbTableName}
+    events:
+      - schedule: rate(1 minute)
 
-#   you can add any of the following events
-#   events:
-#     - http:
-#         path: users/create
-#         method: get
-#     - s3: ${bucket}
-#     - schedule: rate(10 minutes)
-#     - sns: greeter-topic
-
-# you can add CloudFormation resource templates here
-#resources:
-#  Resources:
-#    NewResource:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: my-new-bucket
-#  Outputs:
-#     NewOutput:
-#       Description: "Description for the output"
-#       Value: "Some output value"
+resources:
+  Resources:
+    SouthwestReservationTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:values.dynamodbTableName}
+        AttributeDefinitions:
+          - AttributeName: check_in
+            AttributeType: N
+          - AttributeName: reservation
+            AttributeType: S
+          - AttributeName: first_name
+            AttributeType: S
+          - AttributeName: last_name
+            AttributeType: S
+          - AttributeName: status
+            AttributeType: S
+        KeySchema:
+          - AttributeName: check_in
+            KeyType: Hash
+          - AttributeName: reservation
+            KeyType: Range
