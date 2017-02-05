@@ -42,12 +42,13 @@ def _get_minute_timestamp(dt):
 
 def _get_check_in_time(departure_time):
     """
-    Receives a departure time in the format
+    Receives a departure time in RFC3339 format:
 
         2017-02-09T07:50:00.000-06:00
 
     And returns the check in time (24 hours prior) as a unix timestamp
     """
+    # TODO(dw): This doesn't correctly parse RFC3339 so we're dropping the TZ
     dt = dateutil.parser.parse(departure_time)
     day_before = dt - datetime.timedelta(days=1)
     return _get_minute_timestamp(day_before)
