@@ -14,7 +14,10 @@ import dateutil.parser
 
 from boto3.dynamodb.conditions import Key
 
-import swa
+# Add vendored dependencies to path. These are used in swa.py.
+sys.path.append('./vendor')
+
+import swa # NOQA
 
 # Set up logging
 log = logging.getLogger('lambda')
@@ -23,9 +26,6 @@ ch = logging.StreamHandler(sys.stdout)
 fmt = logging.Formatter('%(asctime)s - %(message)s')
 ch.setFormatter(fmt)
 log.addHandler(ch)
-
-# Add vendored dependencies to path. These are used in swa.py.
-sys.path.append('./vendor')
 
 DYNAMO_TABLE_NAME = os.getenv('DYNAMO_TABLE_NAME')
 dynamo = boto3.resource('dynamodb').Table(DYNAMO_TABLE_NAME)
