@@ -18,7 +18,7 @@ values:
 
 package:
   exclude:
-    - env/
+    - env/**
     - test_swa.py
     - Makefile
     - requirements.txt
@@ -48,12 +48,6 @@ resources:
           - AttributeName: check_in
             AttributeType: N
           - AttributeName: reservation
-            AttributeType: S
-          - AttributeName: first_name
-            AttributeType: S
-          - AttributeName: last_name
-            AttributeType: S
-          - AttributeName: status
             AttributeType: S
         KeySchema:
           - AttributeName: check_in
