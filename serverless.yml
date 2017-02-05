@@ -13,7 +13,7 @@ provider:
         - dynamodb:UpdateItem
       Resource: "arn:aws:dynamodb:*:*:*"
 
-values:
+custom:
   dynamodbTableName: southwest-reservations
 
 package:
@@ -29,12 +29,12 @@ functions:
     handler: lambda.add
     description: look up a reservation and add it to dynamodb
     environment:
-      DYNAMO_TABLE_NAME: ${self:values.dynamodbTableName}
+      DYNAMO_TABLE_NAME: ${self:custom.dynamodbTableName}
   check_in:
     handler: lambda.check_in
     description: find reservations to check-in and queue check-in jobs
     environment:
-      DYNAMO_TABLE_NAME: ${self:values.dynamodbTableName}
+      DYNAMO_TABLE_NAME: ${self:custom.dynamodbTableName}
     events:
       - schedule: rate(1 minute)
 
@@ -43,7 +43,7 @@ resources:
     SouthwestReservationTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:values.dynamodbTableName}
+        TableName: ${self:custom.dynamodbTableName}
         AttributeDefinitions:
           - AttributeName: check_in
             AttributeType: N
@@ -51,6 +51,9 @@ resources:
             AttributeType: S
         KeySchema:
           - AttributeName: check_in
-            KeyType: Hash
+            KeyType: HASH
           - AttributeName: reservation
-            KeyType: Range
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
