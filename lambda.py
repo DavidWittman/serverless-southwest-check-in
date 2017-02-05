@@ -4,15 +4,25 @@
 #
 
 import datetime
+import logging
 import os
 import sys
 import time
 
 import boto3
+import dateutil.parser
 
 from boto3.dynamodb.conditions import Key
 
 import swa
+
+# Set up logging
+log = logging.getLogger('lambda')
+log.setLevel(logging.DEBUG)
+ch = logging.StreamHandler(sys.stdout)
+fmt = logging.Formatter('%(asctime)s - %(message)s')
+ch.setFormatter(fmt)
+log.addHandler(ch)
 
 # Add vendored dependencies to path. These are used in swa.py.
 sys.path.append('./vendor')
@@ -42,8 +52,9 @@ def _get_check_in_time(departure_time):
 
     And returns the check in time (24 hours prior) as a unix timestamp
     """
-    # TODO(dw):
-    return departure_time
+    dt = dateutil.parser.parse(departure_time)
+    day_before = dt - datetime.timedelta(days=1)
+    return _get_minute_timestamp(day_before)
 
 
 def _get_check_in_times_from_reservation(reservation):
@@ -64,12 +75,28 @@ def add(event, context):
     last_name = event['last_name']
     confirmation_number = event['confirmation_number']
 
+    log.info("Looking up reservation {} for {} {}".format(confirmation_number,
+                                                          first_name, last_name))
     reservation = swa.get_reservation(first_name, last_name, confirmation_number)
+    log.debug("Reservation: {}".format(reservation))
+
     check_in_times = _get_check_in_times_from_reservation(reservation)
+    log.info("Scheduling check-ins at {}".format(check_in_times))
 
     for c in check_in_times:
-        # Add to dynamodb
-        pass
+        item = dict(
+            check_in=c,
+            reservation=confirmation_number,
+            first_name=first_name,
+            last_name=last_name,
+            status='pending'
+        )
+
+        log.debug("Check-in entry: {}".format(item))
+        dynamo.put_item(Item=item)
+
+    log.info("Successfully added {} check-ins for {}".format(
+        len(check_in_times), confirmation_number))
 
 
 def check_in(event, context):
