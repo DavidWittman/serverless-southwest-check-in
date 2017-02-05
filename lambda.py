@@ -20,12 +20,8 @@ sys.path.append('./vendor')
 import swa # NOQA
 
 # Set up logging
-log = logging.getLogger('lambda')
+log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
-ch = logging.StreamHandler(sys.stdout)
-fmt = logging.Formatter('%(asctime)s - %(message)s')
-ch.setFormatter(fmt)
-log.addHandler(ch)
 
 DYNAMO_TABLE_NAME = os.getenv('DYNAMO_TABLE_NAME')
 dynamo = boto3.resource('dynamodb').Table(DYNAMO_TABLE_NAME)
