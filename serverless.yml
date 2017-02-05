@@ -26,12 +26,12 @@ package:
 
 functions:
   add:
-    handler: lambda.add
+    handler: handler.add
     description: look up a reservation and add it to dynamodb
     environment:
       DYNAMO_TABLE_NAME: ${self:custom.dynamodbTableName}
   check_in:
-    handler: lambda.check_in
+    handler: handler.check_in
     description: find reservations to check-in and queue check-in jobs
     environment:
       DYNAMO_TABLE_NAME: ${self:custom.dynamodbTableName}
