@@ -2,18 +2,31 @@
 
 ### Requirements
 
- - Serverless
+ - [Serverless](https://serverless.com/framework/docs/providers/aws/guide/installation/)
  - IAM user credentials with Administrator access (for Serverless)
- - Python 2.7.x
 
 ## Usage
 
 ### Configure your AWS Credentials
 
+Add your credentials to your environment, with `aws configure`, or directly with Serverless.
+
+Here's an example of setting your credentials via environment variables. For more detailed explanations, see the [Serverless documentation](https://serverless.com/framework/docs/providers/aws/guide/credentials/).
+
 ``` bash
 $ export AWS_ACCESS_KEY_ID=
 $ export AWS_SECRET_ACCESS_KEY=
 ```
+
+### Deploy
+
+To package, build, and deploy to AWS, run:
+
+``` bash
+$ make deploy
+```
+
+This installs the vendored dependencies and runs `serverless deploy`.
 
 ## Contributing
 
@@ -32,12 +45,4 @@ After you have installed the test dependencies, you can run the test suite with:
 $ make test
 # flake8 style check
 $ make lint
-```
-
-### Deploy
-
-To package, build, and deploy to AWS, run:
-
-``` bash
-$ make deploy
 ```
