@@ -3,21 +3,19 @@
 # Lamba functions for interacting with the Southwest API
 #
 
-import datetime
 import logging
 import os
 import sys
-import time
 
 import boto3
-import pendulum
 
 from boto3.dynamodb.conditions import Key
 
-# Add vendored dependencies to path. These are used in swa.py.
+# Add vendored dependencies to path
 sys.path.append('./vendor')
 
-import swa # NOQA
+import pendulum     # NOQA
+import swa          # NOQA
 
 # Set up logging
 log = logging.getLogger(__name__)
@@ -25,6 +23,12 @@ log.setLevel(logging.DEBUG)
 
 DYNAMO_TABLE_NAME = os.getenv('DYNAMO_TABLE_NAME')
 dynamo = boto3.resource('dynamodb').Table(DYNAMO_TABLE_NAME)
+
+
+def _get_minute_timestamp(dt):
+    """
+    """
+    return dt.replace(second=0, microsecond=0).int_timestamp
 
 
 def _get_check_in_time(departure_time):
@@ -35,9 +39,8 @@ def _get_check_in_time(departure_time):
 
     And returns the check in time (24 hours prior) as a unix timestamp
     """
-    dt = pendulum.parse(departure_time)
-    check_in_time = dt.replace(second=0, microsecond=0).subtract(days=1)
-    return check_in_time.int_timestamp
+    check_in_time = pendulum.parse(departure_time).subtract(days=1)
+    return _get_minute_timestamp(check_in_time)
 
 
 def _get_check_in_times_from_reservation(reservation):
@@ -89,8 +92,8 @@ def check_in(event, context):
     """
 
     # Get a timestamp for the current minute
-    now = _get_minute_timestamp(datetime.datetime.now())
-    response = dynamo.query(KeyConditionExpression=Key('check_in').eq(now))
+    this_minute = _get_minute_timestamp(pendulum.now())
+    response = dynamo.query(KeyConditionExpression=Key('check_in').eq(this_minute))
 
     for reservation in response['Items']:
         # Check in!
