@@ -10,7 +10,7 @@ import sys
 import time
 
 import boto3
-import dateutil.parser
+import pendulum
 
 from boto3.dynamodb.conditions import Key
 
@@ -27,19 +27,6 @@ DYNAMO_TABLE_NAME = os.getenv('DYNAMO_TABLE_NAME')
 dynamo = boto3.resource('dynamodb').Table(DYNAMO_TABLE_NAME)
 
 
-def _get_minute_timestamp(dt):
-    """
-    Returns the minute of a datetime object in unix timestamp form.
-
-    In this example, the real time is 20:24:23 UTC, but it will be
-    rounded down to the nearest minute and converted to an int
-    >>> _get_timestamp()
-    1486239840
-    """
-    minute = dt.replace(second=0, microsecond=0)
-    return int(time.mktime(minute.timetuple()))
-
-
 def _get_check_in_time(departure_time):
     """
     Receives a departure time in RFC3339 format:
@@ -48,10 +35,9 @@ def _get_check_in_time(departure_time):
 
     And returns the check in time (24 hours prior) as a unix timestamp
     """
-    # TODO(dw): This doesn't correctly parse RFC3339 so we're dropping the TZ
-    dt = dateutil.parser.parse(departure_time)
-    day_before = dt - datetime.timedelta(days=1)
-    return _get_minute_timestamp(day_before)
+    dt = pendulum.parse(departure_time)
+    check_in_time = dt.replace(second=0, microsecond=0).subtract(days=1)
+    return check_in_time.int_timestamp
 
 
 def _get_check_in_times_from_reservation(reservation):
