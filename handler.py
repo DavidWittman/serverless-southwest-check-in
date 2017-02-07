@@ -97,10 +97,14 @@ def check_in(event, context):
 
     response = dynamo.query(KeyConditionExpression=Key('check_in').eq(this_minute))
     log.debug("Response: {}".format(response))
-    log.info("Found {} reservations to check in".format(response['Count']))
+    log.info("Found {} reservation(s) to check in".format(response['Count']))
 
     # Check in!
     for r in response['Items']:
         log.info("Checking in {first_name} {last_name} ({reservation})".format(**r))
-        resp = swa.check_in(r['first_name'], r['last_name'], r['reservation'])
-        log.debug("Check in response: {}".format(resp))
+        try:
+            resp = swa.check_in(r['first_name'], r['last_name'], r['reservation'])
+            log.info("Checked in {first_name} {last_name}!".format(**r))
+            log.debug("Check-in response: {}".format(resp))
+        except Exception as e:
+            log.error("Error checking in: {}".format(e))
