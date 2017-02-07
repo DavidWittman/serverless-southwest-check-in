@@ -93,8 +93,14 @@ def check_in(event, context):
 
     # Get a timestamp for the current minute
     this_minute = _get_minute_timestamp(pendulum.now())
-    response = dynamo.query(KeyConditionExpression=Key('check_in').eq(this_minute))
+    log.debug("Current minute: {}".format(this_minute))
 
-    for reservation in response['Items']:
-        # Check in!
-        pass
+    response = dynamo.query(KeyConditionExpression=Key('check_in').eq(this_minute))
+    log.debug("Response: {}".format(response))
+    log.info("Found {} reservations to check in".format(response['Count']))
+
+    # Check in!
+    for r in response['Items']:
+        log.info("Checking in {first_name} {last_name} ({reservation})".format(**r))
+        resp = swa.check_in(r['first_name'], r['last_name'], r['reservation'])
+        log.debug("Check in response: {}".format(resp))
