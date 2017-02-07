@@ -27,6 +27,13 @@ dynamo = boto3.resource('dynamodb').Table(DYNAMO_TABLE_NAME)
 
 def _get_minute_timestamp(dt):
     """
+    Return a timestamp of the most recent minute from a Pendulum datetime object
+
+    >>> now = pendulum.now()
+    >>> print(now)
+    2017-02-06T22:14:09.222312-06:00
+    >>> _get_minute_timestamp(now)
+    1486440840
     """
     return dt.replace(second=0, microsecond=0).int_timestamp
 
