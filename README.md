@@ -36,7 +36,7 @@ $ pip install -r requirements.txt -t vendor && serverless deploy
 Invoke the `add` lambda function via serverless, and pass in your first name, last name, and confirmation number in JSON as parameters for the event. Here's an example:
 
 ```
-$ serverless invoke -f add -d '{ "first_name": "George", "last_name": "Bush", "confirmation_number": "ABC123" }'
+$ serverless invoke --log -f add -d '{ "first_name": "George", "last_name": "Bush", "confirmation_number": "ABC123" }'
 ```
 
 I'll likely add some helper scripts (or an API gateway) around this invocation in the future.

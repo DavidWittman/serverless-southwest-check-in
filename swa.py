@@ -72,7 +72,6 @@ def get_reservation(first_name, last_name, confirmation_number):
         method="get"
     )
 
-    # TODO(dw): Catch exceptions here and send to failed queue
     reservation = response.json()
 
     return reservation
@@ -94,7 +93,6 @@ def check_in(first_name, last_name, confirmation_number):
         content_type
     )
 
-    # TODO(dw): error handling
     check_in_docs = response.json()
 
     return check_in_docs

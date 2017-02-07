@@ -85,11 +85,11 @@ def add(event, context):
             status='pending'
         )
 
-        log.debug("Check-in entry: {}".format(item))
+        log.debug("Adding check-in to Dynamo: {}".format(item))
         dynamo.put_item(Item=item)
 
-    log.info("Successfully added {} check-ins for {}".format(
-        len(check_in_times), confirmation_number))
+    # TODO(dw): Better output. What times are we going to check in?
+    return "Successfully added {} check-ins for reservation {}".format(len(check_in_times), confirmation_number)
 
 
 def check_in(event, context):
