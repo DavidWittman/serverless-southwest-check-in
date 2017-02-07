@@ -8,7 +8,6 @@ import swa
 
 @mock.patch('swa.requests')
 class TestRequest(unittest.TestCase):
-
     def test_make_request_get(self, mock_requests):
         expected_headers = {
             "User-Agent": "Southwest/3.3.7 (iPhone; iOS 9.3; Scale/2.00)",
@@ -54,7 +53,6 @@ class TestRequest(unittest.TestCase):
 class TestCheckIn(unittest.TestCase):
 
     def setUp(self):
-        super(TestCheckIn, self).setUp()
         self.data = {
             'names': [{
                 'firstName': 'George',
@@ -79,12 +77,15 @@ class TestCheckIn(unittest.TestCase):
                 }]
             }]
         }
+        self.first_name = "George"
+        self.last_name = "Bush"
+        self.confirmation_number = "ABC123"
 
     @mock.patch('swa._make_request')
     def test_check_in_call(self, mock_make_request):
-        swa.check_in(self.event, self.context)
+        swa.check_in(self.first_name, self.last_name, self.confirmation_number)
         mock_make_request.assert_called_with(
-            "/reservations/record-locator/B2B8TG/boarding-passes",
+            "/reservations/record-locator/ABC123/boarding-passes",
             self.data,
             "application/vnd.swacorp.com.mobile.boarding-passes-v1.0+json"
         )
@@ -93,17 +94,20 @@ class TestCheckIn(unittest.TestCase):
     def test_check_in_success(self):
         responses.add(
             responses.POST,
-            'https://api-extensions.southwest.com/v1/mobile/reservations/record-locator/B2B8TG/boarding-passes',
+            'https://api-extensions.southwest.com/v1/mobile/reservations/record-locator/ABC123/boarding-passes',
             json=self.successful_check_in_response,
             status=200
         )
-        result = swa.check_in(self.event, self.context)
-        assert result['message'] == "confirmation_number=%s documents=1 emailed=false" % \
-            self.event['confirmation_number']
-        assert result['event'] == self.event
+        result = swa.check_in(self.first_name, self.last_name, self.confirmation_number)
+        assert self.successful_check_in_response == result
 
 
 class TestReservation(unittest.TestCase):
+
+    def setUp(self):
+        self.first_name = "George"
+        self.last_name = "Bush"
+        self.confirmation_number = "ABC123"
 
     @mock.patch('swa._make_request')
     def test_get_reservation_call(self, mock_make_request):
@@ -113,9 +117,9 @@ class TestReservation(unittest.TestCase):
             'last-name': 'Bush'
         }
 
-        swa.get_reservation(self.event, self.context)
+        swa.get_reservation(self.first_name, self.last_name, self.confirmation_number)
         mock_make_request.assert_called_with(
-            "/reservations/record-locator/B2B8TG",
+            "/reservations/record-locator/ABC123",
             fake_data,
             "application/vnd.swacorp.com.mobile.reservations-v1.0+json",
             method='get'
@@ -132,16 +136,13 @@ class TestReservation(unittest.TestCase):
                 }]
             }
         }
-        expected_message = "confirmation_number=B2B8TG first_name=\"George\" last_name=\"Bush\" " \
-                           "departure_time=2016-04-16T10:05:00.000-05:00"
         responses.add(
             responses.GET,
-            'https://api-extensions.southwest.com/v1/mobile/reservations/record-locator/B2B8TG',
+            'https://api-extensions.southwest.com/v1/mobile/reservations/record-locator/ABC123',
             json=fake_response,
             status=200
         )
 
-        result = swa.get_reservation(self.event, self.context)
+        result = swa.get_reservation(self.first_name, self.last_name, self.confirmation_number)
 
-        assert result['event'] == self.event
-        assert result['message'] == expected_message
+        assert result == fake_response
