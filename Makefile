@@ -8,7 +8,6 @@ test:
 	PYTHONPATH=tests/ python -m unittest test_swa
 
 install_deps:
-	mkdir -p vendor
 	pip install -r requirements.txt -t vendor
 
 clean:

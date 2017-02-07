@@ -14,8 +14,8 @@ Add your credentials to your environment, with `aws configure`, or directly with
 Here's an example of setting your credentials via environment variables. For more detailed explanations, see the [Serverless documentation](https://serverless.com/framework/docs/providers/aws/guide/credentials/).
 
 ``` bash
-$ export AWS_ACCESS_KEY_ID=
-$ export AWS_SECRET_ACCESS_KEY=
+$ export AWS_ACCESS_KEY_ID=YOUR_ACCESS_KEY
+$ export AWS_SECRET_ACCESS_KEY=YOUR_SECRET_KEY
 ```
 
 ### Deploy
@@ -25,8 +25,21 @@ To package, build, and deploy to AWS, run:
 ``` bash
 $ make deploy
 ```
+Or, if you don't have make installed:
 
-This installs the vendored dependencies and runs `serverless deploy`.
+```
+$ pip install -r requirements.txt -t vendor && serverless deploy
+```
+
+### Add a flight
+
+Invoke the `add` lambda function via serverless, and pass in your first name, last name, and confirmation number in JSON as parameters for the event. Here's an example:
+
+```
+$ serverless invoke -f add -d '{ "first_name": "George", "last_name": "Bush", "confirmation_number": "ABC123" }'
+```
+
+I'll likely add some helper scripts (or an API gateway) around this invocation in the future.
 
 ## Contributing
 
