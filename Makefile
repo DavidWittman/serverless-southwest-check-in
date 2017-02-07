@@ -5,7 +5,7 @@ lint:
 	flake8 --max-line-length=120 *.py
 
 test:
-	python -m unittest test_swa
+	PYTHONPATH=tests/ python -m unittest test_swa
 
 install_deps:
 	mkdir -p vendor
