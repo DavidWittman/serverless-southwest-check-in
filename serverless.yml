@@ -3,6 +3,7 @@ service: southwest-checkin
 provider:
   name: aws
   runtime: python2.7
+  memorySize: 128
   iamRoleStatements:
     - Effect: Allow
       Action:
