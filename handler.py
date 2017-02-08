@@ -64,9 +64,12 @@ def add(event, context):
     """
     Looks up a reservation and adds check in times to DynamoDB
     """
+
     first_name = event['first_name']
     last_name = event['last_name']
     confirmation_number = event['confirmation_number']
+    # Optional parameters
+    email = event.get('email')
 
     log.info("Looking up reservation {} for {} {}".format(confirmation_number,
                                                           first_name, last_name))
@@ -84,6 +87,8 @@ def add(event, context):
             last_name=last_name,
             status='pending'
         )
+        if email is not None:
+            item['email'] = email
 
         log.debug("Adding check-in to Dynamo: {}".format(item))
         dynamo.put_item(Item=item)
@@ -109,9 +114,18 @@ def check_in(event, context):
     # Check in!
     for r in response['Items']:
         log.info("Checking in {first_name} {last_name} ({reservation})".format(**r))
+
         try:
             resp = swa.check_in(r['first_name'], r['last_name'], r['reservation'])
             log.info("Checked in {first_name} {last_name}!".format(**r))
             log.debug("Check-in response: {}".format(resp))
         except Exception as e:
             log.error("Error checking in: {}".format(e))
+            continue
+
+        if 'email' in r:
+            log.info("Emailing boarding pass to {}".format(r['email']))
+            try:
+                swa.email_boarding_pass(r['first_name'], r['last_name'], r['reservation'], r['email'])
+            except Exception as e:
+                log.error("Error emailing boarding pass: {}".format(e))

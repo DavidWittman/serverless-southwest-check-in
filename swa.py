@@ -96,3 +96,23 @@ def check_in(first_name, last_name, confirmation_number):
     check_in_docs = response.json()
 
     return check_in_docs
+
+
+def email_boarding_pass(first_name, last_name, confirmation_number, email):
+    content_type = "application/vnd.swacorp.com.mobile.notifications-v1.0+json"
+
+    data = {
+        'names': [{
+            'firstName': first_name,
+            'lastName': last_name,
+            'emailAddress': email
+        }]
+    }
+
+    response = _make_request(
+        "/record-locator/%s/operation-infos/mobile-boarding-pass/notifications" % confirmation_number,
+        data,
+        content_type
+    )
+
+    return response.json()
