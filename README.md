@@ -1,11 +1,15 @@
+# Serverless Southwest Check In
+
+[![Build Status](https://travis-ci.org/DavidWittman/serverless-southwest-check-in.svg?branch=master)](https://travis-ci.org/DavidWittman/serverless-southwest-check-in)
+
 ## Installation
+
+Skip to the [Deploy](#deploy) section if you already have the Serverless framework installed and configured with your AWS credentials.
 
 ### Requirements
 
- - [Serverless](https://serverless.com/framework/docs/providers/aws/guide/installation/)
+ - [Serverless](https://serverless.com/framework/docs/providers/aws/guide/installation/). Install this first.
  - IAM user credentials with Administrator access (for Serverless)
-
-## Usage
 
 ### Configure your AWS Credentials
 
@@ -17,6 +21,8 @@ Here's an example of setting your credentials via environment variables. For mor
 $ export AWS_ACCESS_KEY_ID=YOUR_ACCESS_KEY
 $ export AWS_SECRET_ACCESS_KEY=YOUR_SECRET_KEY
 ```
+
+## Usage
 
 ### Deploy
 
