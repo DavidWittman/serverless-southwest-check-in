@@ -104,9 +104,9 @@ def email_boarding_pass(first_name, last_name, confirmation_number, email):
     data = {
         'names': [{
             'firstName': first_name,
-            'lastName': last_name,
-            'emailAddress': email
-        }]
+            'lastName': last_name
+        }],
+        'emailAddress': email
     }
 
     response = _make_request(
