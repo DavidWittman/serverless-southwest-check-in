@@ -39,11 +39,19 @@ $ pip install -r requirements.txt -t vendor && serverless deploy
 
 ### Add a flight
 
-Invoke the `add` lambda function via serverless, and pass in your first name, last name, and confirmation number in JSON as parameters for the event. Here's an example:
+Invoke the `add` lambda function via serverless, and pass in your check-in details in JSON as parameters for the event. Here's an example:
 
 ```
-$ serverless invoke --log -f add -d '{ "first_name": "George", "last_name": "Bush", "confirmation_number": "ABC123" }'
+$ serverless invoke --log -f add -d '{
+"first_name": "George",
+"last_name": "Bush",
+"confirmation_number": "ABC123",
+"email": "gwb@example.com"
+}'
+
 ```
+
+The `email` parameter is optional and sets the email address to which your boarding passes will be sent.
 
 I'll likely add some helper scripts (or an API gateway) around this invocation in the future.
 

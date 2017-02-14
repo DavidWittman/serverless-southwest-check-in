@@ -108,6 +108,24 @@ class TestReservation(unittest.TestCase):
         self.first_name = "George"
         self.last_name = "Bush"
         self.confirmation_number = "ABC123"
+        self.email = "gwb@example.com"
+
+    @mock.patch('swa._make_request')
+    def test_email_boarding_pass(self, mock_make_request):
+        fake_data = {
+            'names': [{
+                'firstName': 'George',
+                'lastName': 'Bush'
+            }],
+            'emailAddress': 'gwb@example.com'
+        }
+
+        swa.email_boarding_pass(self.first_name, self.last_name, self.confirmation_number, self.email)
+        mock_make_request.assert_called_with(
+            "/record-locator/ABC123/operation-infos/mobile-boarding-pass/notifications",
+            fake_data,
+            "application/vnd.swacorp.com.mobile.notifications-v1.0+json"
+        )
 
     @mock.patch('swa._make_request')
     def test_get_reservation_call(self, mock_make_request):
@@ -125,6 +143,7 @@ class TestReservation(unittest.TestCase):
             method='get'
         )
 
+    # This test is pretty pointless since we never really interact after the request is made
     @responses.activate
     def test_get_reservation_success(self):
         fake_response = {
