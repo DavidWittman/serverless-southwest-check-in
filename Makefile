@@ -14,4 +14,4 @@ clean:
 	-rm -rf vendor/
 	-find . -type f -name '*.pyc' -delete
 
-.PHONY: deploy lint test install_deps deploy_lambda clean
+.PHONY: deploy lint test install_deps clean
