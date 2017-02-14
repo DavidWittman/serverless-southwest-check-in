@@ -2,6 +2,10 @@
 
 [![Build Status](https://travis-ci.org/DavidWittman/serverless-southwest-check-in.svg?branch=master)](https://travis-ci.org/DavidWittman/serverless-southwest-check-in)
 
+Automatically check in to your Southwest flight with Amazon Lambda and DynamoDB.
+
+This project was inspired by similar projects from [Aaron Ortbals](https://github.com/aortbals/southwest-checkin) and [Joe Beda](https://github.com/jbeda/southwest-checkin).
+
 ## Installation
 
 Skip to the [Deploy](#deploy) section if you already have the Serverless framework installed and configured with your AWS credentials.
