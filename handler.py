@@ -84,8 +84,7 @@ def add(event, context):
             check_in=c,
             reservation=confirmation_number,
             first_name=first_name,
-            last_name=last_name,
-            status='pending'
+            last_name=last_name
         )
         if email is not None:
             item['email'] = email
@@ -95,6 +94,13 @@ def add(event, context):
 
     # TODO(dw): Better output. What times are we going to check in?
     return "Successfully added {} check-ins for reservation {}".format(len(check_in_times), confirmation_number)
+
+
+def _delete_check_in(check_in_time, reservation):
+    log.info("Removing completed check-in from DynamoDB")
+    resp = dynamo.delete_item(Key={'check_in': check_in_time, 'reservation': reservation})
+    if resp['HTTPStatusCode'] != 200:
+        log.error("Error deleting item from DynamoDB. Response: {}".format(resp))
 
 
 def check_in(event, context):
@@ -129,3 +135,5 @@ def check_in(event, context):
                 swa.email_boarding_pass(r['first_name'], r['last_name'], r['reservation'], r['email'])
             except Exception as e:
                 log.error("Error emailing boarding pass: {}".format(e))
+
+        _delete_check_in(this_minute, r['reservation'])
