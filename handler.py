@@ -98,9 +98,12 @@ def add(event, context):
 
 def _delete_check_in(check_in_time, reservation):
     log.info("Removing completed check-in from DynamoDB")
-    resp = dynamo.delete_item(Key={'check_in': check_in_time, 'reservation': reservation})
-    if resp['HTTPStatusCode'] != 200:
-        log.error("Error deleting item from DynamoDB. Response: {}".format(resp))
+    try:
+        resp = dynamo.delete_item(Key={'check_in': check_in_time, 'reservation': reservation})
+        if resp['HTTPStatusCode'] != 200:
+            raise Exception("HTTP Error from DynamoDB: {}".format(resp))
+    except Exception as e:
+        log.error("Error deleting item from DynamoDB: {}".format(e))
 
 
 def check_in(event, context):
