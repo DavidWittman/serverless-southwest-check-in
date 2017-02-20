@@ -1,5 +1,8 @@
 service: southwest-checkin
 
+custom:
+  dynamodbTableName: southwest-reservations
+
 provider:
   name: aws
   runtime: python2.7
@@ -13,10 +16,7 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:*:*:*"
-
-custom:
-  dynamodbTableName: southwest-reservations
+      Resource: "arn:aws:dynamodb:*:*:table/${self:custom.dynamodbTableName}"
 
 package:
   exclude:
