@@ -57,5 +57,5 @@ resources:
           - AttributeName: reservation
             KeyType: RANGE
         ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+          ReadCapacityUnits: 25
+          WriteCapacityUnits: 5
