@@ -52,8 +52,7 @@ def _get_check_in_time(departure_time):
 
 def _get_check_in_times_from_reservation(reservation):
     """
-    This is a generator which returns the future check-in times from a
-    Southwest reservation response.
+    Returns the future check-in times from a Southwest reservation response.
 
     Times are represented as a Unix timestamp, and any check-ins which are
     before the current time are ignored.
@@ -61,11 +60,11 @@ def _get_check_in_times_from_reservation(reservation):
     now = pendulum.now().int_timestamp
     flights = reservation['itinerary']['originationDestinations']
 
-    for flight in flights:
-        for segment in flight['segments']:
-            check_in_time = _get_check_in_time(segment['departureDateTime'])
-            if check_in_time > now:
-                yield check_in_time
+    return [
+        _get_check_in_time(segment['departureDateTime']) for flight in flights
+        for segment in flight['segments']
+        if _get_check_in_time(segment['departureDateTime']) > now
+    ]
 
 
 def add(event, context):
@@ -84,13 +83,13 @@ def add(event, context):
     reservation = swa.get_reservation(first_name, last_name, confirmation_number)
     log.debug("Reservation: {}".format(reservation))
 
-    # FIXME(dw): this is now a generator
     check_in_times = _get_check_in_times_from_reservation(reservation)
-    log.info("Scheduling check-ins at {}".format(check_in_times))
 
-    for c in check_in_times:
+    for check_in_time in check_in_times:
+        log.info("Scheduling check-in at {}".format(check_in_time))
+
         item = dict(
-            check_in=c,
+            check_in=check_in_time,
             reservation=confirmation_number,
             first_name=first_name,
             last_name=last_name
@@ -101,8 +100,8 @@ def add(event, context):
         log.debug("Adding check-in to Dynamo: {}".format(item))
         dynamo.put_item(Item=item)
 
-    # TODO(dw): Better output. What times are we going to check in?
-    return "Successfully added {} check-ins for reservation {}".format(len(check_in_times), confirmation_number)
+    return "Successfully added {} check-in(s) for reservation {}: {}".format(
+        len(check_in_times), confirmation_number, check_in_times)
 
 
 def _delete_check_in(check_in_time, reservation):
