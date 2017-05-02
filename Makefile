@@ -2,16 +2,16 @@ deploy: clean install_deps
 	serverless deploy
 
 lint:
-	flake8 --max-line-length=120 *.py
+	flake8 --max-line-length=120 lambda/*.py
 
 test:
-	PYTHONPATH=tests/ python -m unittest test_swa
+	PYTHONPATH=lambda/tests:lambda python -m unittest test_swa
 
 install_deps:
-	pip install -r requirements.txt -t vendor
+	pip install -r lambda/requirements.txt -t lambda/vendor
 
 clean:
-	-rm -rf vendor/
+	-rm -rf lambda/vendor/
 	-find . -type f -name '*.pyc' -delete
 
 .PHONY: deploy lint test install_deps clean

@@ -5,6 +5,7 @@
 
 import logging
 import os
+import re
 import sys
 
 import boto3
@@ -21,8 +22,8 @@ import swa          # NOQA
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
-DYNAMO_TABLE_NAME = os.getenv('DYNAMO_TABLE_NAME')
-dynamo = boto3.resource('dynamodb').Table(DYNAMO_TABLE_NAME)
+dynamo = boto3.client('dynamodb')
+S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
 
 
 def _get_minute_timestamp(dt):
@@ -148,3 +149,96 @@ def check_in(event, context):
                 log.error("Error emailing boarding pass: {}".format(e))
 
         _delete_check_in(this_minute, r['reservation'])
+
+
+class ReservationNotFoundError(Exception):
+    pass
+
+
+class SesMailNotification(object):
+    def __init__(self, data, s3_bucket=S3_BUCKET_NAME):
+        self.data = data
+        self.subject = data['commonHeaders']['subject']
+        self.source = data['source']
+        self.from_header = data['commonHeaders']['from']
+        self.message_id = data['messageId']
+        self._body = None
+        # S3 bucket where SES messages are saved to
+        self.s3_bucket = s3_bucket
+
+    def body(self):
+        """
+        Retrieves the body of the email from S3.
+
+        This requires that you set up a previous action in your SES rules to
+        store the message in S3.
+        """
+
+        if self._body is None:
+            log.debug("Downloading message body from s3://{}/{}".format(
+                self.s3_bucket, self.message_id))
+            s3 = boto3.client('s3')
+            obj = s3.get_object(Bucket=self.s3_bucket, Key=self.message_id)
+            self._body = obj['Body'].read().decode('utf-8')
+
+        return self._body
+
+
+def _find_name_and_reservation(msg):
+    """
+    Searches through the SES notification for passenger name
+    and reservation number.
+    """
+
+    fname, lname, reservation = None, None, None
+
+    # Try to match `(5PK4YZ) | 22APR17 | AUS-MCI | Wittman/David`
+    match = re.search(r"\(([A-Z0-9]{6})\).*\| (\w+\/\w+)", msg.subject)
+
+    if match:
+        log.debug("Found a reservation email: {}".format(msg.subject))
+        reservation = match.group(1)
+        lname, fname = match.group(2).split('/')
+
+    elif "Here's your itinerary!" in msg.subject:
+        log.debug("Found an itinerary email: {}".format(msg.subject))
+
+        match = re.search(r"\(([A-Z0-9]{6})\)", msg.subject)
+        if match:
+            reservation = match.group(1)
+
+        log.debug("Reservation found: {}".format(reservation))
+
+        regex = r"PASSENGER([\w\s]+)Check in"
+        match = re.search(regex, msg.body())
+
+        if match:
+            # TODO(dw): This makes assumptions about the name,
+            # specifically that the first word is their first name and the
+            # last word is their last name.
+            log.debug("Passenger matched. Parsing first and last name")
+            name_parts = match.group(1).strip().split(' ')
+            fname, lname = name_parts[0], name_parts[-1]
+
+    log.info("Passenger: {} {}, Confirmation Number: {}".format(
+        fname, lname, reservation))
+
+    if not all([fname, lname, reservation]):
+        raise ReservationNotFoundError("Unable to find reservation in email id {}".format(
+            msg.message_id))
+
+    return fname, lname, reservation
+
+
+def receive_email(event, context):
+    ses_notification = event['Records'][0]['ses']
+    log.debug("SES Notification: {}".format(ses_notification))
+
+    ses_msg = SesMailNotification(ses_notification['mail'])
+
+    try:
+        fname, lname, reservation = _find_name_and_reservation(ses_msg)
+        log.info("Found reservation {} for {} {}".format(reservation, fname, lname))
+    except Exception as e:
+        log.error("Error scraping email {}: {}".format(ses_msg.message_id, e))
+        return 1
