@@ -3,10 +3,10 @@ import unittest
 import mock
 import responses
 
-import swa
+from lib import swa
 
 
-@mock.patch('swa.requests')
+@mock.patch('lib.swa.requests')
 class TestRequest(unittest.TestCase):
     def test_make_request_get(self, mock_requests):
         expected_headers = {
@@ -81,7 +81,7 @@ class TestCheckIn(unittest.TestCase):
         self.last_name = "Bush"
         self.confirmation_number = "ABC123"
 
-    @mock.patch('swa._make_request')
+    @mock.patch('lib.swa._make_request')
     def test_check_in_call(self, mock_make_request):
         swa.check_in(self.first_name, self.last_name, self.confirmation_number)
         mock_make_request.assert_called_with(
@@ -101,6 +101,16 @@ class TestCheckIn(unittest.TestCase):
         result = swa.check_in(self.first_name, self.last_name, self.confirmation_number)
         assert self.successful_check_in_response == result
 
+    def test_get_check_in_time(self):
+        departure_time = "2017-02-09T07:50:00.000-06:00"
+        expected = "2017-02-08T07:50:00.000-06:00"
+
+        result = swa._get_check_in_time(departure_time)
+        assert str(result) == "2017-02-08T07:50:00-06:00"
+
+    def test_get_check_in_times_from_reservation(self):
+        pass
+
 
 class TestReservation(unittest.TestCase):
 
@@ -110,7 +120,7 @@ class TestReservation(unittest.TestCase):
         self.confirmation_number = "ABC123"
         self.email = "gwb@example.com"
 
-    @mock.patch('swa._make_request')
+    @mock.patch('lib.swa._make_request')
     def test_email_boarding_pass(self, mock_make_request):
         fake_data = {
             'names': [{
@@ -127,7 +137,7 @@ class TestReservation(unittest.TestCase):
             "application/vnd.swacorp.com.mobile.notifications-v1.0+json"
         )
 
-    @mock.patch('swa._make_request')
+    @mock.patch('lib.swa._make_request')
     def test_get_reservation_call(self, mock_make_request):
         fake_data = {
             'action': 'VIEW',
