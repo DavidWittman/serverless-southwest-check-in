@@ -7,6 +7,7 @@ funcsigs==1.0.2
 mccabe==0.5.2
 mock==2.0.0
 pbr==1.10.0
+pendulum==1.0.2
 pycodestyle==2.0.0
 pyflakes==1.2.3
 requests==2.11.1
