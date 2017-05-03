@@ -48,7 +48,14 @@ resource "aws_iam_role_policy" "lambda" {
       "Action": [
         "s3:GetObject"
       ],
-      "Resource": "arn:aws:s3:::${var.domain}-emails/*"
+      "Resource": "${aws_s3_bucket.email.arn}/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "states:StartExecution"
+      ],
+      "Resource": "${aws_sfn_state_machine.check_in.id}"
     }
   ]
 }

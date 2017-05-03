@@ -3,6 +3,7 @@
 # Lamba functions for interacting with the Southwest API
 #
 
+import json
 import logging
 import os
 import re
@@ -52,7 +53,6 @@ def schedule_check_in(event, context):
     log.debug("Reservation: {}".format(reservation))
 
     event['check_in_times']['remaining'] = _get_check_in_times_from_reservation(reservation)
-    event['check_in_times']['next'] = event['check_in_times']['remaining'].pop()
 
     # Call ourself now that we have some check-in times.
     return schedule_check_in(event, None)
@@ -169,7 +169,7 @@ class SesMailNotification(object):
         return self._body
 
 
-def _find_name_and_reservation(msg):
+def _find_name_and_confirmation_number(msg):
     """
     Searches through the SES notification for passenger name
     and reservation number.
@@ -212,18 +212,38 @@ def _find_name_and_reservation(msg):
         raise ReservationNotFoundError("Unable to find reservation in email id {}".format(
             msg.message_id))
 
-    return fname, lname, reservation
+    return dict(first_name=fname, last_name=lname, confirmation_number=reservation)
 
 
 def receive_email(event, context):
+    sfn = boto3.client('stepfunctions')
     ses_notification = event['Records'][0]['ses']
+    # ARN of the AWS Step State Machine to execute when an email
+    # is successfully parsed and a new check-in should run.
+    state_machine_arn = os.getenv('STATE_MACHINE_ARN')
+
+    log.debug("State Machine ARN: {}".format(state_machine_arn))
     log.debug("SES Notification: {}".format(ses_notification))
 
     ses_msg = SesMailNotification(ses_notification['mail'])
 
     try:
-        fname, lname, reservation = _find_name_and_reservation(ses_msg)
-        log.info("Found reservation {} for {} {}".format(reservation, fname, lname))
+        reservation = _find_name_and_confirmation_number(ses_msg)
+        log.info("Found reservation: {}".format(reservation))
     except Exception as e:
         log.error("Error scraping email {}: {}".format(ses_msg.message_id, e))
-        return 1
+        return
+
+    execution = sfn.start_execution(
+        stateMachineArn=state_machine_arn,
+        input=json.dumps(reservation)
+    )
+
+    log.debug("State machine started at: {}".format(execution['startDate']))
+    log.debug("Execution ARN: {}".format(execution['executionArn']))
+
+    # Remove the startDate from the return value because datetime objects don't
+    # easily serialize to JSON.
+    del(execution['startDate'])
+
+    return execution
