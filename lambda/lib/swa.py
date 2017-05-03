@@ -3,15 +3,14 @@
 # Functions for interacting with the Southwest API
 #
 
+import pendulum
 import requests
+
+from . import exceptions
 
 BASE_URL = "https://api-extensions.southwest.com/v1/mobile"
 USER_AGENT = "Southwest/3.3.7 (iPhone; iOS 9.3; Scale/2.00)"
 API_KEY = "l7xx8d8bfce4ee874269bedc02832674129b"
-
-
-class SouthwestAPIError(Exception):
-    pass
 
 
 def _make_request(path, data, content_type, method='post', check_status_code=True):
@@ -47,9 +46,40 @@ def _make_request(path, data, content_type, method='post', check_status_code=Tru
         except:
             msg = response.reason
 
-        raise SouthwestAPIError("status_code=%s msg=\"%s\"" % (response.status_code, msg))
+        raise exceptions.SouthwestAPIError("status_code={} msg=\"{}\"".format(
+            response.status_code, msg))
 
     return response
+
+
+def _get_check_in_time(departure_time):
+    """
+    Receives a departure time in RFC3339 format:
+
+        2017-02-09T07:50:00.000-06:00
+
+    And returns the check in time (24 hours prior) as a pendulum time object
+    """
+    return pendulum.parse(departure_time).subtract(days=1)
+
+
+def get_check_in_times_from_reservation(reservation):
+    """
+    Return a sorted and reversed list of check-in times for a reservation as
+    RFC3339 timestamps.
+
+    Times are sorted and reversed so that the soonest check-in time may be
+    popped from the end of the list.
+    """
+
+    flights = reservation['itinerary']['originationDestinations']
+
+    times = [
+        _get_check_in_time(segment['departureDateTime']) for flight in flights
+        for segment in flight['segments']
+    ]
+
+    return map(str, reversed(sorted(times)))
 
 
 def get_reservation(first_name, last_name, confirmation_number):
