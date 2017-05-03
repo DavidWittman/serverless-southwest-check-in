@@ -1,5 +1,5 @@
 resource "aws_iam_role" "lambda" {
-  name = "lambda-check-in"
+  name = "sw-lambda"
 
   assume_role_policy = <<POLICY
 {
@@ -10,8 +10,7 @@ resource "aws_iam_role" "lambda" {
       "Principal": {
         "Service": "lambda.amazonaws.com"
       },
-      "Effect": "Allow",
-      "Sid": ""
+      "Effect": "Allow"
     }
   ]
 }
@@ -19,7 +18,7 @@ POLICY
 }
 
 resource "aws_iam_role_policy" "lambda" {
-  name = "sw-check-in"
+  name = "sw-lambda"
   role = "${aws_iam_role.lambda.id}"
 
   policy = <<POLICY
@@ -50,6 +49,45 @@ resource "aws_iam_role_policy" "lambda" {
         "s3:GetObject"
       ],
       "Resource": "arn:aws:s3:::${var.domain}-emails/*"
+    }
+  ]
+}
+POLICY
+}
+
+resource "aws_iam_role" "state_machine" {
+  name = "sw-state-machine"
+
+  assume_role_policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "states.${data.aws_region.current.name}.amazonaws.com"
+      },
+      "Effect": "Allow"
+    }
+  ]
+}
+POLICY
+}
+
+resource "aws_iam_role_policy" "state_machine" {
+  name = "sw-state-machine"
+  role = "${aws_iam_role.state_machine.id}"
+
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "lambda:InvokeFunction"
+      ],
+      "Resource": "*"
     }
   ]
 }

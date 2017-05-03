@@ -4,24 +4,6 @@ data "archive_file" "lambda" {
   output_path = "${path.module}/build/lambda.zip"
 }
 
-resource "aws_lambda_function" "sw_add_checkin" {
-  filename         = "${data.archive_file.lambda.output_path}"
-  function_name    = "sw-add-checkin"
-  role             = "${aws_iam_role.lambda.arn}"
-  handler          = "handler.add"
-  runtime          = "python2.7"
-  source_code_hash = "${data.archive_file.lambda.output_base64sha256}"
-}
-
-resource "aws_lambda_function" "sw_checkin" {
-  filename         = "${data.archive_file.lambda.output_path}"
-  function_name    = "sw-checkin"
-  role             = "${aws_iam_role.lambda.arn}"
-  handler          = "handler.check_in"
-  runtime          = "python2.7"
-  source_code_hash = "${data.archive_file.lambda.output_base64sha256}"
-}
-
 resource "aws_lambda_function" "sw_receive_email" {
   filename         = "${data.archive_file.lambda.output_path}"
   function_name    = "sw-receive-email"
@@ -32,9 +14,28 @@ resource "aws_lambda_function" "sw_receive_email" {
 
   environment {
     variables = {
-      S3_BUCKET_NAME = "${aws_s3_bucket.email.id}"
+      S3_BUCKET_NAME    = "${aws_s3_bucket.email.id}"
+      STATE_MACHINE_ARN = "${aws_sfn_state_machine.check_in.id}"
     }
   }
+}
+
+resource "aws_lambda_function" "sw_schedule_check_in" {
+  filename         = "${data.archive_file.lambda.output_path}"
+  function_name    = "sw-schedule-check-in"
+  role             = "${aws_iam_role.lambda.arn}"
+  handler          = "handler.schedule_check_in"
+  runtime          = "python2.7"
+  source_code_hash = "${data.archive_file.lambda.output_base64sha256}"
+}
+
+resource "aws_lambda_function" "sw_check_in" {
+  filename         = "${data.archive_file.lambda.output_path}"
+  function_name    = "sw-check-in"
+  role             = "${aws_iam_role.lambda.arn}"
+  handler          = "handler.check_in"
+  runtime          = "python2.7"
+  source_code_hash = "${data.archive_file.lambda.output_base64sha256}"
 }
 
 resource "aws_lambda_permission" "allow_ses" {

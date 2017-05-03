@@ -1,5 +1,5 @@
 #
-# lambda.py
+# handler.py
 # Lamba functions for interacting with the Southwest API
 #
 
@@ -9,8 +9,6 @@ import re
 import sys
 
 import boto3
-
-from boto3.dynamodb.conditions import Key
 
 # Add vendored dependencies to path
 sys.path.append('./vendor')
@@ -22,21 +20,42 @@ import swa          # NOQA
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
-dynamo = boto3.client('dynamodb')
+# S3 bucket where emails received by SES are stored
 S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
 
 
-def _get_minute_timestamp(dt):
+def schedule_check_in(event, context):
     """
-    Return a timestamp of the most recent minute from a Pendulum datetime object
+    Looks up a reservation using the Southwest API and returns the available
+    check-in times as a descending list.
 
-    >>> now = pendulum.now()
-    >>> print(now)
-    2017-02-06T22:14:09.222312-06:00
-    >>> _get_minute_timestamp(now)
-    1486440840
+    Returns:
+      {'check_in_times': {'remaining': ['check_in2', 'check_in1']}}
+
     """
-    return dt.replace(second=0, microsecond=0).int_timestamp
+
+    # We already have the check-in times, just schedule the next one.
+    if 'check_in_times' in event:
+        event['check_in_times']['next'] = event['check_in_times']['remaining'].pop()
+        return event
+
+    # New check-in, fetch reservation
+    first_name = event['first_name']
+    last_name = event['last_name']
+    confirmation_number = event['confirmation_number']
+
+    event['check_in_times'] = {}
+
+    log.info("Looking up reservation {} for {} {}".format(confirmation_number,
+                                                          first_name, last_name))
+    reservation = swa.get_reservation(first_name, last_name, confirmation_number)
+    log.debug("Reservation: {}".format(reservation))
+
+    event['check_in_times']['remaining'] = _get_check_in_times_from_reservation(reservation)
+    event['check_in_times']['next'] = event['check_in_times']['remaining'].pop()
+
+    # Call ourself now that we have some check-in times.
+    return schedule_check_in(event, None)
 
 
 def _get_check_in_time(departure_time):
@@ -45,110 +64,76 @@ def _get_check_in_time(departure_time):
 
         2017-02-09T07:50:00.000-06:00
 
-    And returns the check in time (24 hours prior) as a unix timestamp
+    And returns the check in time (24 hours prior) as a pendulum time object
     """
-    check_in_time = pendulum.parse(departure_time).subtract(days=1)
-    return _get_minute_timestamp(check_in_time)
+    return pendulum.parse(departure_time).subtract(days=1)
 
 
 def _get_check_in_times_from_reservation(reservation):
     """
-    Returns the future check-in times from a Southwest reservation response.
+    Return a sorted and reversed list of check-in times for a reservation as
+    RFC3339 timestamps.
 
-    Times are represented as a Unix timestamp, and any check-ins which are
-    before the current time are ignored.
+    Times are sorted and reversed so that the soonest check-in time may be
+    popped from the end of the list.
     """
-    now = pendulum.now().int_timestamp
+
     flights = reservation['itinerary']['originationDestinations']
 
-    return [
+    times = [
         _get_check_in_time(segment['departureDateTime']) for flight in flights
         for segment in flight['segments']
         if _get_check_in_time(segment['departureDateTime']) > now
     ]
 
+    return map(str, reversed(sorted(times)))
 
-def add(event, context):
+
+class NotLastCheckIn(Exception):
     """
-    Looks up a reservation and adds check in times to DynamoDB
+    This exception is raised in the check_in handler when additional
+    check-ins remain. It is used to form a ghetto loop as described above.
+    TODO(dw): Finish this description
+    """
+    pass
+
+
+def check_in(event, context):
+    """
+    TODO(dw): Fix description
+    Retrieves reservations which are ready to be checked in from DynamoDB and
+    checks them in via the Southwest API
     """
 
     first_name = event['first_name']
     last_name = event['last_name']
     confirmation_number = event['confirmation_number']
-    # Optional parameters
     email = event.get('email')
 
-    log.info("Looking up reservation {} for {} {}".format(confirmation_number,
-                                                          first_name, last_name))
-    reservation = swa.get_reservation(first_name, last_name, confirmation_number)
-    log.debug("Reservation: {}".format(reservation))
+    log.info("Checking in {} {} ({})".format(first_name, last_name,
+                                             confirmation_number))
 
-    check_in_times = _get_check_in_times_from_reservation(reservation)
-
-    for check_in_time in check_in_times:
-        log.info("Scheduling check-in at {}".format(check_in_time))
-
-        item = dict(
-            check_in=check_in_time,
-            reservation=confirmation_number,
-            first_name=first_name,
-            last_name=last_name
-        )
-        if email is not None:
-            item['email'] = email
-
-        log.debug("Adding check-in to Dynamo: {}".format(item))
-        dynamo.put_item(Item=item)
-
-    return "Successfully added {} check-in(s) for reservation {}: {}".format(
-        len(check_in_times), confirmation_number, check_in_times)
-
-
-def _delete_check_in(check_in_time, reservation):
-    log.info("Removing completed check-in from DynamoDB")
     try:
-        resp = dynamo.delete_item(Key={'check_in': check_in_time, 'reservation': reservation})
-        if resp['HTTPStatusCode'] != 200:
-            raise Exception("HTTP Error from DynamoDB: {}".format(resp))
+        resp = swa.check_in(first_name, last_name, confirmation_number)
+        log.info("Checked in {} {}!".format(first_name, last_name))
+        log.debug("Check-in response: {}".format(resp))
     except Exception as e:
-        log.error("Error deleting item from DynamoDB: {}".format(e))
+        log.error("Error checking in: {}".format(e))
+        raise
 
-
-def check_in(event, context):
-    """
-    Retrieves reservations which are ready to be checked in from DynamoDB and
-    checks them in via the Southwest API
-    """
-
-    # Get a timestamp for the current minute
-    this_minute = _get_minute_timestamp(pendulum.now())
-    log.debug("Current minute: {}".format(this_minute))
-
-    response = dynamo.query(KeyConditionExpression=Key('check_in').eq(this_minute))
-    log.debug("Response: {}".format(response))
-    log.info("Found {} reservation(s) to check in".format(response['Count']))
-
-    # Check in!
-    for r in response['Items']:
-        log.info("Checking in {first_name} {last_name} ({reservation})".format(**r))
-
+    if email:
+        log.info("Emailing boarding pass to {}".format(email))
         try:
-            resp = swa.check_in(r['first_name'], r['last_name'], r['reservation'])
-            log.info("Checked in {first_name} {last_name}!".format(**r))
-            log.debug("Check-in response: {}".format(resp))
+            swa.email_boarding_pass(
+                first_name, last_name, confirmation_number, email
+            )
         except Exception as e:
-            log.error("Error checking in: {}".format(e))
-            continue
+            log.error("Error emailing boarding pass: {}".format(e))
 
-        if 'email' in r:
-            log.info("Emailing boarding pass to {}".format(r['email']))
-            try:
-                swa.email_boarding_pass(r['first_name'], r['last_name'], r['reservation'], r['email'])
-            except Exception as e:
-                log.error("Error emailing boarding pass: {}".format(e))
-
-        _delete_check_in(this_minute, r['reservation'])
+    # Raise exception to schedule the next check-in
+    # This is caught by AWS Step and then schedule_check_in is called again
+    if len(event['check_in_times']['remaining']) > 0:
+        raise NotLastCheckIn()
 
 
 class ReservationNotFoundError(Exception):
