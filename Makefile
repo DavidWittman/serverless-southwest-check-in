@@ -1,5 +1,5 @@
 deploy: clean install_deps
-	serverless deploy
+	terraform apply
 
 lint:
 	flake8 --max-line-length=120 lambda/*.py
