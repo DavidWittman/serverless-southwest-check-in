@@ -7,6 +7,7 @@ import json
 import logging
 import os
 import sys
+import uuid
 
 import boto3
 
@@ -116,8 +117,13 @@ def receive_email(event, context):
     if not ses_msg.source.endswith('southwest.com'):
         reservation['email'] = ses_msg.source
 
+    execution_name = "{}-{}-{}".format(
+        reservation['last_name'], reservation['first_name'], uuid.uuid4()
+    )
+
     execution = sfn.start_execution(
         stateMachineArn=state_machine_arn,
+        name=execution_name,
         input=json.dumps(reservation)
     )
 
