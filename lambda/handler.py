@@ -23,11 +23,28 @@ log.setLevel(logging.DEBUG)
 
 def schedule_check_in(event, context):
     """
-    Looks up a reservation using the Southwest API and returns the available
-    check-in times as a descending list.
+    This function serves two purposes:
 
-    Returns:
-      {'check_in_times': {'remaining': ['check_in2', 'check_in1']}}
+        1) For new executions, it looks up the reservation via the Southwest
+           API and returns the check-in times (described below).
+
+        2) In the event there are multiple check-ins, this function is called
+           again by the AWS Step state machine to schedule the next available
+           check-in time. It does this by popping a value from
+           `check_in_times.remaining` into `check_in_times.next`.
+
+    Returns a dictionary of the next and remaining check-in times in RFC 3339
+    format. Ex:
+
+        {
+            "check_in_times": {
+                "next": "2017-05-06T20:40:00-04:00",
+                "remaining": [
+                    "2017-05-12T20:40:00-04:00",
+                    "2017-05-09T20:40:00-04:00"
+                ]
+            }
+        }
 
     """
 
@@ -58,9 +75,8 @@ def schedule_check_in(event, context):
 
 def check_in(event, context):
     """
-    TODO(dw): Fix description
-    Retrieves reservations which are ready to be checked in from DynamoDB and
-    checks them in via the Southwest API
+    This function is triggered at check-in time and completes the check-in via
+    the Southwest API and emails the reservation, if requested.
     """
 
     first_name = event['first_name']
@@ -95,6 +111,13 @@ def check_in(event, context):
 
 
 def receive_email(event, context):
+    """
+    This function is triggered when as an SES Action when a new e-mail is
+    received. It scrapes the email to find the name and confirmation
+    number of the passenger to check-in, and then executes the AWS Step
+    state machine provided in the `STATE_MACHINE_ARN` environment variable.
+    """
+
     sfn = boto3.client('stepfunctions')
     ses_notification = event['Records'][0]['ses']
     # ARN of the AWS Step State Machine to execute when an email
