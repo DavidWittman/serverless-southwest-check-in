@@ -79,7 +79,7 @@ def get_check_in_times_from_reservation(reservation):
         for segment in flight['segments']
     ]
 
-    return map(str, reversed(sorted(times)))
+    return list(map(str, reversed(sorted(times))))
 
 
 def get_reservation(first_name, last_name, confirmation_number):
