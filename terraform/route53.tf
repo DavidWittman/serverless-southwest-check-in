@@ -7,7 +7,7 @@ resource "aws_route53_record" "ses_inbound_mx" {
   name    = "${var.domain}"
   type    = "MX"
   ttl     = "300"
-  records = ["10 inbound-smtp.us-east-1.amazonaws.com"]
+  records = ["10 inbound-smtp.${data.aws_region.current.name}.amazonaws.com"]
 }
 
 resource "aws_route53_record" "ses_verification_txt" {
