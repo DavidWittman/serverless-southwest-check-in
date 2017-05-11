@@ -76,8 +76,8 @@ def get_check_in_times_from_reservation(reservation):
     flights = reservation['itinerary']['originationDestinations']
 
     times = [
-        _get_check_in_time(segment['departureDateTime']) for flight in flights
-        for segment in flight['segments']
+        _get_check_in_time(flight['segments'][0]['departureDateTime'])
+        for flight in flights
     ]
 
     return list(map(str, reversed(sorted(times))))
