@@ -1,5 +1,5 @@
 resource "aws_sfn_state_machine" "check_in" {
-  name     = "sw-check-in"
+  name     = "check-in"
   role_arn = "${aws_iam_role.state_machine.arn}"
 
   definition = <<EOF
