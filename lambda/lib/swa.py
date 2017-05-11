@@ -10,6 +10,7 @@ from . import exceptions
 
 BASE_URL = "https://api-extensions.southwest.com/v1/mobile"
 USER_AGENT = "Southwest/3.3.7 (iPhone; iOS 9.3; Scale/2.00)"
+# This is not a secret. Well, not my secret at least.
 API_KEY = "l7xx8d8bfce4ee874269bedc02832674129b"
 
 
