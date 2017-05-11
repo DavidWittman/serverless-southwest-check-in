@@ -10,6 +10,7 @@ resource "aws_lambda_function" "sw_receive_email" {
   role             = "${aws_iam_role.lambda.arn}"
   handler          = "handler.receive_email"
   runtime          = "python2.7"
+  timeout          = 10
   source_code_hash = "${data.archive_file.lambda.output_base64sha256}"
 
   environment {
@@ -26,6 +27,7 @@ resource "aws_lambda_function" "sw_schedule_check_in" {
   role             = "${aws_iam_role.lambda.arn}"
   handler          = "handler.schedule_check_in"
   runtime          = "python2.7"
+  timeout          = 10
   source_code_hash = "${data.archive_file.lambda.output_base64sha256}"
 }
 
@@ -35,6 +37,7 @@ resource "aws_lambda_function" "sw_check_in" {
   role             = "${aws_iam_role.lambda.arn}"
   handler          = "handler.check_in"
   runtime          = "python2.7"
+  timeout          = 15
   source_code_hash = "${data.archive_file.lambda.output_base64sha256}"
 }
 
