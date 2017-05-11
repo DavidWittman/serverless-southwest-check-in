@@ -110,6 +110,19 @@ def check_in(event, context):
         raise exceptions.NotLastCheckIn()
 
 
+def _get_sfn_execution_name(reservation):
+    """
+    Generate a human-readable execution named composed of the passenger's
+    first and last name follwed by a UUID
+    """
+    name = "{}-{}-{}".format(
+        reservation['last_name'].lower(),
+        reservation['first_name'].lower(),
+        uuid.uuid4()
+    )
+    return name
+
+
 def receive_email(event, context):
     """
     This function is triggered when as an SES Action when a new e-mail is
@@ -140,13 +153,9 @@ def receive_email(event, context):
     if not ses_msg.source.endswith('southwest.com'):
         reservation['email'] = ses_msg.source
 
-    execution_name = "{}-{}-{}".format(
-        reservation['last_name'], reservation['first_name'], uuid.uuid4()
-    )
-
     execution = sfn.start_execution(
         stateMachineArn=state_machine_arn,
-        name=execution_name,
+        name=_get_sfn_execution_name(reservation),
         input=json.dumps(reservation)
     )
 
