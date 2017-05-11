@@ -2,28 +2,32 @@
 
 [![Build Status](https://travis-ci.org/DavidWittman/serverless-southwest-check-in.svg?branch=master)](https://travis-ci.org/DavidWittman/serverless-southwest-check-in)
 
-Automatically check in to your Southwest flight with Amazon Lambda and DynamoDB.
+Automatically check in to your Southwest flight using the AWS Serverless Platform.
 
 This project was inspired by similar projects from [Aaron Ortbals](https://github.com/aortbals/southwest-checkin) and [Joe Beda](https://github.com/jbeda/southwest-checkin).
 
+## Quickstart
+
 ## Installation
 
-Skip to the [Deploy](#deploy) section if you already have the Serverless framework installed and configured with your AWS credentials.
+Skip to the [Deploy](#deploy) section if you already have Terraform installed and configured with your AWS credentials.
 
 ### Requirements
 
- - [Serverless](https://serverless.com/framework/docs/providers/aws/guide/installation/). Install this first.
- - IAM user credentials with Administrator access (for Serverless)
+ - [Terraform](https://www.terraform.io/intro/getting-started/install.html). Install this first.
+ - AWS IAM user credentials with Administrator access (for Terraform)
+ - A Route53 hosted zone for receiving emails via SES
 
 ### Configure your AWS Credentials
 
-Add your credentials to your environment, with `aws configure`, or directly with Serverless.
+Add your credentials to your environment, with `aws configure`, or directly with Terraform.
 
-Here's an example of setting your credentials via environment variables. For more detailed explanations, see the [Serverless documentation](https://serverless.com/framework/docs/providers/aws/guide/credentials/).
+Here's an example of setting your credentials via environment variables. For more detailed explanations, see the [Terraform AWS Provider documentation](https://www.terraform.io/docs/providers/aws/).
 
 ``` bash
 $ export AWS_ACCESS_KEY_ID=YOUR_ACCESS_KEY
 $ export AWS_SECRET_ACCESS_KEY=YOUR_SECRET_KEY
+$ export AWS_DEFAULT_REGION=us-east-1
 ```
 
 ## Usage
@@ -35,38 +39,54 @@ To package, build, and deploy to AWS, run:
 ``` bash
 $ make deploy
 ```
+
 Or, if you don't have make installed:
 
 ```
-$ pip install -r requirements.txt -t vendor && serverless deploy
+$ pip install -r lambda/requirements.txt -t lambda/vendor && terraform apply
 ```
+
+Terraform will prompt you to provide a domain name of an existing Route53 Hosted Zone. The MX record for this domain name will be set to the SES SMTP receiver endpoints for your region, so choose a domain which you do not currently use to receive email. In the future, support will be added for subdomains and/or disabling the email receiver.
 
 ### Add a flight
 
-Invoke the `add` lambda function via serverless, and pass in your check-in details in JSON as parameters for the event. Here's an example:
+New flights can be added by executing the AWS Step Function or by an SES (email) trigger.
+
+#### Manually execute Step Function
+
+Invoke the `sw-schedule-check-in` Lambda function via the AWS cli, and pass in your check-in details in JSON as parameters for the event. Here's an example:
 
 ```
-$ serverless invoke --log -f add -d '{
-"first_name": "George",
-"last_name": "Bush",
-"confirmation_number": "ABC123",
-"email": "gwb@example.com"
+STEP_FN_INPUT='{
+  "first_name": "George",
+  "last_name": "Bush",
+  "confirmation_number": "ABC123",
+  "email": "gwb@example.com"
 }'
-
+STEP_FN_ARN=$(aws --output text stepfunctions list-state-machines --query 'stateMachines[*].stateMachineArn' | grep -E ':sw-check-in$')
+aws stepfunctions start-execution \
+  --state-machine-arn "$STEP_FN_ARN" \
+  --input "$STEP_FN_INPUT"
 ```
 
 The `email` parameter is optional and sets the email address to which your boarding passes will be sent.
 
-I'll likely add some helper scripts (or an API gateway) around this invocation in the future.
+#### Add via Email
+
+Alternatively, check-ins can be submitted via e-mail using the AWS SES Lambda Receiver Action. To submit check-ins this way, just forward your reservation email to `checkin@$DOMAIN` where domain is the Route53 domain used when deploying the application. The reservation email is sent by Southwest at purchase time and should be in the form:
+
+```
+Flight reservation (ABC123) | 25DEC17 | ABC-XYZ | LASTNAME/FIRSTNAME
+```
 
 ## Contributing
 
 ### Testing
 
-To run tests, you must first have the requirements provided in `requirements-dev.txt` installed:
+To run tests, you must first have the requirements provided in `lambda/requirements-dev.txt` installed:
 
 ``` bash
-$ pip install -r requirements-dev.txt
+$ pip install -r lambda/requirements-dev.txt
 ```
 
 After you have installed the test dependencies, you can run the test suite with:

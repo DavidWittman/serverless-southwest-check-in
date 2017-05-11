@@ -1,5 +1,7 @@
 *.swp
 *.pyc
 env/
-vendor/
-.serverless
+terraform/build/
+lambda/vendor/
+*.tfstate
+*.tfstate.backup
