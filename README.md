@@ -16,6 +16,7 @@ Skip to the [Deploy](#deploy) section if you already have Terraform installed an
 
  - [Terraform](https://www.terraform.io/intro/getting-started/install.html). Install this first.
  - AWS IAM user credentials with Administrator access (for Terraform)
+ - A Route53 hosted zone for receiving emails via SES
 
 ### Configure your AWS Credentials
 
@@ -45,9 +46,11 @@ Or, if you don't have make installed:
 $ pip install -r lambda/requirements.txt -t lambda/vendor && terraform apply
 ```
 
+Terraform will prompt you to provide a domain name of an existing Route53 Hosted Zone. The MX record for this domain name will be set to the SES SMTP receiver endpoints for your region, so choose a domain which you do not currently use to receive email. In the future, support will be added for subdomains and/or disabling the email receiver.
+
 ### Add a flight
 
-New flights can be added by executing the AWS Step Function or by Email trigger.
+New flights can be added by executing the AWS Step Function or by an SES (email) trigger.
 
 #### Manually execute Step Function
 
@@ -70,9 +73,11 @@ The `email` parameter is optional and sets the email address to which your board
 
 #### Add via Email
 
-Alternatively, check-ins can be submitted via e-mail using the AWS SES Lambda Receiver Action.
+Alternatively, check-ins can be submitted via e-mail using the AWS SES Lambda Receiver Action. To submit check-ins this way, just forward your reservation email to `checkin@$DOMAIN` where domain is the Route53 domain used when deploying the application. The reservation email is sent by Southwest at purchase time and should be in the form:
 
-TODO
+```
+Flight reservation (ABC123) | 25DEC17 | ABC-XYZ | LASTNAME/FIRSTNAME
+```
 
 ## Contributing
 
