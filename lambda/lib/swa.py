@@ -17,6 +17,10 @@ API_KEY = "l7xx8d8bfce4ee874269bedc02832674129b"
 class Reservation():
     def __init__(self, data):
         self.data = data
+        self.confirmation_number = self.data['recordLocator']
+
+    def __repr__(self):
+        return "<Reservation {}>".format(self.confirmation_number)
 
     @classmethod
     def from_passenger_info(cls, first_name, last_name, confirmation_number):
@@ -47,11 +51,13 @@ class Reservation():
         """
         return pendulum.parse(departure_time).subtract(days=1)
 
+
     @property
-    def check_in_times(self):
+    def check_in_times(self, expired=False):
         """
         Return a sorted and reversed list of check-in times for a reservation as
-        RFC3339 timestamps.
+        RFC3339 timestamps. By default, only future checkin times are returned.
+        Set `expired` to True to return all checkin times.
 
         Times are sorted and reversed so that the soonest check-in time may be
         popped from the end of the list.
@@ -63,6 +69,10 @@ class Reservation():
             self._get_check_in_time(flight['segments'][0]['departureDateTime'])
             for flight in flights
         ]
+
+        # Remove expired checkins from results
+        if not expired:
+            times = filter(lambda x: x > pendulum.now(), times)
 
         return list(map(str, reversed(sorted(times))))
 

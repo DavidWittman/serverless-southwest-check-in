@@ -17,13 +17,13 @@
                 {
                     "earlyBirdProductId": "QVVTfDIwMTctMDgtMTh8NjIxNnxEQVZJRHxMfFdJVFRNQU58SlJ8MTUwMA==",
                     "status": "ELIGIBLE",
-                    "originationDestinationId": "201708181850-0500,201708182050-0500|AUS-BNA|WN6216",
+                    "originationDestinationId": "209908181850-0500,209908182050-0500|AUS-BNA|WN6216",
                     "priceCents": 1500
                 },
                 {
                     "earlyBirdProductId": "Qk5BfDIwMTctMDgtMjJ8MTk2NHxEQVZJRHxMfFdJVFRNQU58SlJ8MTUwMA==",
                     "status": "ELIGIBLE",
-                    "originationDestinationId": "201708220735-0500,201708220945-0500|BNA-AUS|WN1964",
+                    "originationDestinationId": "209908220735-0500,209908220945-0500|BNA-AUS|WN1964",
                     "priceCents": 1500
                 }
             ],
@@ -62,7 +62,7 @@
                             "flightNumber": "6216"
                         },
                         "originationAirportCode": "AUS",
-                        "departureDateTime": "2017-08-18T18:50:00.000-05:00",
+                        "departureDateTime": "2099-08-18T18:50:00.000-05:00",
                         "legs": [
                             {
                                 "destinationAirportCode": "BNA",
@@ -71,7 +71,7 @@
                         ],
                         "destinationAirportCode": "BNA",
                         "wifiAvailable": null,
-                        "arrivalDateTime": "2017-08-18T20:50:00.000-05:00"
+                        "arrivalDateTime": "2099-08-18T20:50:00.000-05:00"
                     }
                 ],
                 "_links": {
@@ -79,7 +79,7 @@
                 },
                 "checkinDocumentReason": null,
                 "fareType": "Wanna Get Away",
-                "originationDestinationId": "201708181850-0500,201708182050-0500|AUS-BNA|WN6216"
+                "originationDestinationId": "209908181850-0500,209908182050-0500|AUS-BNA|WN6216"
             },
             {
                 "durationMinutes": 130,
@@ -95,7 +95,7 @@
                             "flightNumber": "1964"
                         },
                         "originationAirportCode": "BNA",
-                        "departureDateTime": "2017-08-22T07:35:00.000-05:00",
+                        "departureDateTime": "2099-08-22T07:35:00.000-05:00",
                         "legs": [
                             {
                                 "destinationAirportCode": "AUS",
@@ -104,7 +104,7 @@
                         ],
                         "destinationAirportCode": "AUS",
                         "wifiAvailable": null,
-                        "arrivalDateTime": "2017-08-22T09:45:00.000-05:00"
+                        "arrivalDateTime": "2099-08-22T09:45:00.000-05:00"
                     }
                 ],
                 "_links": {
@@ -112,7 +112,7 @@
                 },
                 "checkinDocumentReason": null,
                 "fareType": "Wanna Get Away",
-                "originationDestinationId": "201708220735-0500,201708220945-0500|BNA-AUS|WN1964"
+                "originationDestinationId": "209908220735-0500,209908220945-0500|BNA-AUS|WN1964"
             }
         ]
     },

@@ -17,13 +17,13 @@
         {
           "earlyBirdProductId": "QVVTfDIwMTctMDUtMTN8NDE4MHxBTEVYQU5EUkF8TUlMTEVSfEJBU1N8fDE1MDA=",
           "status": "ELIGIBLE",
-          "originationDestinationId": "201705130855-0500,201705131050-0500|AUS-MCI|WN4180",
+          "originationDestinationId": "209905130855-0500,209905131050-0500|AUS-MCI|WN4180",
           "priceCents": 1500
         },
         {
           "earlyBirdProductId": "TUNJfDIwMTctMDUtMTR8NDExNnxBTEVYQU5EUkF8TUlMTEVSfEJBU1N8fDE1MDA=",
           "status": "ELIGIBLE",
-          "originationDestinationId": "201705141510-0500,201705141715-0500|MCI-AUS|WN4116",
+          "originationDestinationId": "209905141510-0500,209905141715-0500|MCI-AUS|WN4116",
           "priceCents": 1500
         }
       ],
@@ -46,13 +46,13 @@
         {
           "earlyBirdProductId": "QVVTfDIwMTctMDUtMTN8NDE4MHxEQVZJU3xIQUxFfEJBU1N8fDE1MDA=",
           "status": "ELIGIBLE",
-          "originationDestinationId": "201705130855-0500,201705131050-0500|AUS-MCI|WN4180",
+          "originationDestinationId": "209905130855-0500,209905131050-0500|AUS-MCI|WN4180",
           "priceCents": 1500
         },
         {
           "earlyBirdProductId": "TUNJfDIwMTctMDUtMTR8NDExNnxEQVZJU3xIQUxFfEJBU1N8fDE1MDA=",
           "status": "ELIGIBLE",
-          "originationDestinationId": "201705141510-0500,201705141715-0500|MCI-AUS|WN4116",
+          "originationDestinationId": "209905141510-0500,209905141715-0500|MCI-AUS|WN4116",
           "priceCents": 1500
         }
       ],
@@ -91,7 +91,7 @@
               "flightNumber": "4180"
             },
             "originationAirportCode": "AUS",
-            "departureDateTime": "2017-05-13T08:55:00.000-05:00",
+            "departureDateTime": "2099-05-13T08:55:00.000-05:00",
             "legs": [
               {
                 "destinationAirportCode": "MCI",
@@ -100,7 +100,7 @@
             ],
             "destinationAirportCode": "MCI",
             "wifiAvailable": null,
-            "arrivalDateTime": "2017-05-13T10:50:00.000-05:00"
+            "arrivalDateTime": "2099-05-13T10:50:00.000-05:00"
           }
         ],
         "_links": {
@@ -108,7 +108,7 @@
         },
         "checkinDocumentReason": null,
         "fareType": "Wanna Get Away",
-        "originationDestinationId": "201705130855-0500,201705131050-0500|AUS-MCI|WN4180"
+        "originationDestinationId": "209905130855-0500,209905131050-0500|AUS-MCI|WN4180"
       },
       {
         "durationMinutes": 125,
@@ -124,7 +124,7 @@
               "flightNumber": "4116"
             },
             "originationAirportCode": "MCI",
-            "departureDateTime": "2017-05-14T15:10:00.000-05:00",
+            "departureDateTime": "2099-05-14T15:10:00.000-05:00",
             "legs": [
               {
                 "destinationAirportCode": "AUS",
@@ -133,7 +133,7 @@
             ],
             "destinationAirportCode": "AUS",
             "wifiAvailable": null,
-            "arrivalDateTime": "2017-05-14T17:15:00.000-05:00"
+            "arrivalDateTime": "2099-05-14T17:15:00.000-05:00"
           }
         ],
         "_links": {
@@ -141,7 +141,7 @@
         },
         "checkinDocumentReason": null,
         "fareType": "Wanna Get Away",
-        "originationDestinationId": "201705141510-0500,201705141715-0500|MCI-AUS|WN4116"
+        "originationDestinationId": "209905141510-0500,209905141715-0500|MCI-AUS|WN4116"
       }
     ]
   },
