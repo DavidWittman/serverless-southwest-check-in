@@ -23,7 +23,7 @@ class TestScheduleCheckIn(unittest.TestCase):
     def test_schedule_check_in(self):
         expected = {
             'passengers': [
-                ("GEORGE", "BUSH")
+                {"firstName": "GEORGE", "lastName": "BUSH"}
             ],
             'confirmation_number': 'ABC123',
             'check_in_times': {
@@ -47,8 +47,8 @@ class TestScheduleCheckIn(unittest.TestCase):
     def test_schedule_multi_passenger_check_in(self):
         expected = {
             'passengers': [
-                ("GEORGE", "BUSH"),
-                ("LAURA", "BUSH")
+                {"firstName": "GEORGE", "lastName": "BUSH"},
+                {"firstName": "LAURA", "lastName": "BUSH"},
             ],
             'confirmation_number': 'ABC123',
             'check_in_times': {
@@ -75,8 +75,8 @@ class TestCheckIn(unittest.TestCase):
     def test_multi_passenger_check_in(self):
         fake_event = {                                                                                                    
             'passengers': [                                                                                             
-                ("GEORGE", "BUSH"),                                                                                     
-                ("LAURA", "BUSH")                                                                                       
+                {"firstName": "GEORGE", "lastName": "BUSH"},
+                {"firstName": "LAURA", "lastName": "BUSH"},
             ],                                                                                                          
             'confirmation_number': 'ABC123',                                                                            
             'check_in_times': {                                                                                         
@@ -108,8 +108,8 @@ class TestCheckIn(unittest.TestCase):
     def test_not_last_check_in(self):
         fake_event = {                                                                                                    
             'passengers': [                                                                                             
-                ("GEORGE", "BUSH"),                                                                                     
-                ("LAURA", "BUSH")                                                                                       
+                {"firstName": "GEORGE", "lastName": "BUSH"},
+                {"firstName": "LAURA", "lastName": "BUSH"},
             ],                                                                                                          
             'confirmation_number': 'ABC123',                                                                            
             'check_in_times': {                                                                                         

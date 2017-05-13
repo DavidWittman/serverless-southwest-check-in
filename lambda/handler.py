@@ -90,36 +90,31 @@ def check_in(event, context):
     email = event['email']
 
     # Support older check-ins which did not support multiple passengers
-    if 'passengers' not in event:
-        event['passengers'] = [
-            (event['first_name'], event['last_name'])
-        ]
+    if "passengers" in event:
+        passengers = event['passengers']
+    else:
+        passengers = [{
+            "firstName": event['first_name'],
+            "lastName": event['last_name']
+        }]
 
-    # TODO(dw): This can be done with one API call by passing multiple
-    # names with the checkin call in the form:
-    # names: [{'firstName': "George", 'lastName': "Bush"}]
-    for first_name, last_name in event['passengers']:
-        log.info("Checking in {} {} ({})".format(
-            first_name, last_name, confirmation_number
-        ))
+    log.info("Checking in {} ({})".format(
+        passengers, confirmation_number
+    ))
 
-        try:
-            resp = swa.check_in(first_name, last_name, confirmation_number)
-            log.info("Checked in {} {}!".format(first_name, last_name))
-            log.debug("Check-in response: {}".format(resp))
-        except Exception as e:
-            log.error("Error checking in: {}".format(e))
-            raise
+    try:
+        resp = swa.check_in(passengers, confirmation_number)
+        log.info("Checked in {} passengers!".format(len(passengers)))
+        log.debug("Check-in response: {}".format(resp))
+    except Exception as e:
+        log.error("Error checking in: {}".format(e))
+        raise
 
-        # TODO(dw): Same as above, this supports passing multiple names
-        # to the Southwest API call.
-        log.info("Emailing boarding pass to {}".format(email))
-        try:
-            swa.email_boarding_pass(
-                first_name, last_name, confirmation_number, email
-            )
-        except Exception as e:
-            log.error("Error emailing boarding pass: {}".format(e))
+    log.info("Emailing boarding passes to {}".format(email))
+    try:
+        swa.email_boarding_pass(passengers, confirmation_number, email)
+    except Exception as e:
+        log.error("Error emailing boarding pass: {}".format(e))
 
     # Raise exception to schedule the next check-in
     # This is caught by AWS Step and then schedule_check_in is called again

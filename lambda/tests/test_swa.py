@@ -55,6 +55,10 @@ class TestRequest(unittest.TestCase):
 class TestCheckIn(unittest.TestCase):
 
     def setUp(self):
+        self.names = [{
+            'firstName': 'George',
+            'lastName': 'Bush'
+        }]
         self.data = {
             'names': [{
                 'firstName': 'George',
@@ -68,7 +72,7 @@ class TestCheckIn(unittest.TestCase):
 
     @mock.patch('lib.swa._make_request')
     def test_check_in_call(self, mock_make_request):
-        swa.check_in(self.first_name, self.last_name, self.confirmation_number)
+        swa.check_in(self.names, self.confirmation_number)
         mock_make_request.assert_called_with(
             "/reservations/record-locator/ABC123/boarding-passes",
             self.data,
@@ -83,7 +87,7 @@ class TestCheckIn(unittest.TestCase):
             json=util.load_fixture('check_in_success'),
             status=200
         )
-        result = swa.check_in(self.first_name, self.last_name, self.confirmation_number)
+        result = swa.check_in(self.names, self.confirmation_number)
         assert result['passengerCheckInDocuments'][0]['passenger']['firstName'] == "GEORGE"
         assert result['passengerCheckInDocuments'][0]['passenger']['lastName'] == "BUSH"
 
@@ -97,7 +101,7 @@ class TestCheckIn(unittest.TestCase):
             'emailAddress': 'gwb@example.com'
         }
 
-        swa.email_boarding_pass(self.first_name, self.last_name, self.confirmation_number, self.email)
+        swa.email_boarding_pass(self.names, self.confirmation_number, self.email)
         mock_make_request.assert_called_with(
             "/record-locator/ABC123/operation-infos/mobile-boarding-pass/notifications",
             fake_data,
@@ -121,13 +125,18 @@ class TestReservation(unittest.TestCase):
 
     def test_passengers(self):
         fixture = util.load_fixture('get_reservation')
+        expected = [{"firstName": "GEORGE", "lastName": "BUSH"}]
         r = swa.Reservation(fixture)
-        assert r.passengers == [("GEORGE", "BUSH")]
+        assert r.passengers == expected
 
     def test_multiple_passengers(self):
         fixture = util.load_fixture('get_multi_passenger_reservation')
+        expected = [
+            {"firstName": "GEORGE", "lastName": "BUSH"},
+            {"firstName": "LAURA", "lastName": "BUSH"}
+        ]
         r = swa.Reservation(fixture)
-        assert r.passengers == [("GEORGE", "BUSH"), ("LAURA", "BUSH")]
+        assert r.passengers == expected
 
     def test_check_in_times(self):
         fixture = util.load_fixture('get_reservation')

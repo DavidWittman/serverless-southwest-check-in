@@ -68,11 +68,11 @@ class Reservation():
 
     @property
     def passengers(self):
-        # TODO(dw): This works better with the API if it's returned as
-        # names: [{"firstName": "", "lastName": ""}]
         return [
-            (p['secureFlightName']['firstName'], p['secureFlightName']['lastName'])
-            for p in self.data['passengers']
+            dict(
+                firstName=p['secureFlightName']['firstName'],
+                lastName=p['secureFlightName']['lastName']
+            ) for p in self.data['passengers']
         ]
 
 
@@ -115,14 +115,11 @@ def _make_request(path, data, content_type, method='post', check_status_code=Tru
     return response
 
 
-def check_in(first_name, last_name, confirmation_number):
+def check_in(names, confirmation_number):
     content_type = "application/vnd.swacorp.com.mobile.boarding-passes-v1.0+json"
 
     data = {
-        'names': [{
-            'firstName': first_name,
-            'lastName': last_name
-        }]
+        'names': names
     }
 
     response = _make_request(
@@ -136,14 +133,11 @@ def check_in(first_name, last_name, confirmation_number):
     return check_in_docs
 
 
-def email_boarding_pass(first_name, last_name, confirmation_number, email):
+def email_boarding_pass(names, confirmation_number, email):
     content_type = "application/vnd.swacorp.com.mobile.notifications-v1.0+json"
 
     data = {
-        'names': [{
-            'firstName': first_name,
-            'lastName': last_name
-        }],
+        'names': names,
         'emailAddress': email
     }
 
