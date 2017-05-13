@@ -86,23 +86,28 @@ def check_in(event, context):
     the Southwest API and emails the reservation, if requested.
     """
 
-    first_name = event['first_name']
-    last_name = event['last_name']
     confirmation_number = event['confirmation_number']
-    email = event.get('email')
+    email = event['email']
 
-    log.info("Checking in {} {} ({})".format(first_name, last_name,
-                                             confirmation_number))
+    # Support older check-ins which did not support multiple passengers
+    if 'passengers' not in event:
+        event['passengers'] = [
+            (event['first_name'], event['last_name'])
+        ]
 
-    try:
-        resp = swa.check_in(first_name, last_name, confirmation_number)
-        log.info("Checked in {} {}!".format(first_name, last_name))
-        log.debug("Check-in response: {}".format(resp))
-    except Exception as e:
-        log.error("Error checking in: {}".format(e))
-        raise
+    for first_name, last_name in event['passengers']:
+        log.info("Checking in {} {} ({})".format(
+            first_name, last_name, confirmation_number
+        ))
 
-    if email:
+        try:
+            resp = swa.check_in(first_name, last_name, confirmation_number)
+            log.info("Checked in {} {}!".format(first_name, last_name))
+            log.debug("Check-in response: {}".format(resp))
+        except Exception as e:
+            log.error("Error checking in: {}".format(e))
+            raise
+
         log.info("Emailing boarding pass to {}".format(email))
         try:
             swa.email_boarding_pass(
