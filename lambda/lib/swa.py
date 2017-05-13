@@ -68,6 +68,8 @@ class Reservation():
 
     @property
     def passengers(self):
+        # TODO(dw): This works better with the API if it's returned as
+        # names: [{"firstName": "", "lastName": ""}]
         return [
             (p['secureFlightName']['firstName'], p['secureFlightName']['lastName'])
             for p in self.data['passengers']

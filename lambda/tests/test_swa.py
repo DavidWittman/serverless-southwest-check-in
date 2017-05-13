@@ -61,24 +61,6 @@ class TestCheckIn(unittest.TestCase):
                 'lastName': 'Bush'
             }]
         }
-        # TODO(dw): Complete this fixture and move it elsewhere in the test suite
-        self.successful_check_in_response = {
-            'maxFailedCheckInAttemptsReached': False,
-            'passengerCheckInDocuments': [{
-                'passenger': {
-                    'firstName': 'George',
-                    'lastName': 'Bush'
-                 },
-                'checkinDocuments': [{
-                    'boardingGroupNumber': '01',
-                    'boardingGroup': 'A',
-                    'documentType': 'BOARDING_PASS',
-                    'origin': 'AUS',
-                    'destination': 'LAS',
-                    'flightNumber': '4242'
-                }]
-            }]
-        }
         self.first_name = "George"
         self.last_name = "Bush"
         self.confirmation_number = "ABC123"
@@ -98,11 +80,12 @@ class TestCheckIn(unittest.TestCase):
         responses.add(
             responses.POST,
             'https://api-extensions.southwest.com/v1/mobile/reservations/record-locator/ABC123/boarding-passes',
-            json=self.successful_check_in_response,
+            json=util.load_fixture('check_in_success'),
             status=200
         )
         result = swa.check_in(self.first_name, self.last_name, self.confirmation_number)
-        assert self.successful_check_in_response == result
+        assert result['passengerCheckInDocuments'][0]['passenger']['firstName'] == "GEORGE"
+        assert result['passengerCheckInDocuments'][0]['passenger']['lastName'] == "BUSH"
 
     @mock.patch('lib.swa._make_request')
     def test_email_boarding_pass(self, mock_make_request):

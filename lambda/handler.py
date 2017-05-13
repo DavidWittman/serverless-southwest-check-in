@@ -95,6 +95,9 @@ def check_in(event, context):
             (event['first_name'], event['last_name'])
         ]
 
+    # TODO(dw): This can be done with one API call by passing multiple
+    # names with the checkin call in the form:
+    # names: [{'firstName': "George", 'lastName': "Bush"}]
     for first_name, last_name in event['passengers']:
         log.info("Checking in {} {} ({})".format(
             first_name, last_name, confirmation_number
@@ -108,6 +111,8 @@ def check_in(event, context):
             log.error("Error checking in: {}".format(e))
             raise
 
+        # TODO(dw): Same as above, this supports passing multiple names
+        # to the Southwest API call.
         log.info("Emailing boarding pass to {}".format(email))
         try:
             swa.email_boarding_pass(
