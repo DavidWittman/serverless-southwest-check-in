@@ -13,7 +13,8 @@ class TestScheduleCheckIn(unittest.TestCase):
         self.mock_event = {
             'first_name': 'George',
             'last_name': 'Bush',
-            'confirmation_number': 'ABC123'
+            'confirmation_number': 'ABC123',
+            'email': 'gwb@aol.com'
         }
 
     @responses.activate
@@ -26,7 +27,8 @@ class TestScheduleCheckIn(unittest.TestCase):
             'check_in_times': {
                 'remaining': ['2017-08-21T07:35:00-05:00'],
                 'next': '2017-08-17T18:50:00-05:00'
-            }
+            },
+            'email': 'gwb@aol.com'
         }
 
         responses.add(
@@ -50,7 +52,8 @@ class TestScheduleCheckIn(unittest.TestCase):
             'check_in_times': {
                 'remaining': ['2017-05-13T15:10:00-05:00'],
                 'next': '2017-05-12T08:55:00-05:00'
-            }
+            },
+            'email': 'gwb@aol.com'
         }
 
         responses.add(
