@@ -3,6 +3,8 @@ import unittest
 import mock
 import responses
 
+import util
+
 from lib import swa
 
 
@@ -53,37 +55,24 @@ class TestRequest(unittest.TestCase):
 class TestCheckIn(unittest.TestCase):
 
     def setUp(self):
+        self.names = [{
+            'firstName': 'George',
+            'lastName': 'Bush'
+        }]
         self.data = {
             'names': [{
                 'firstName': 'George',
                 'lastName': 'Bush'
             }]
         }
-        # TODO(dw): Complete this fixture and move it elsewhere in the test suite
-        self.successful_check_in_response = {
-            'maxFailedCheckInAttemptsReached': False,
-            'passengerCheckInDocuments': [{
-                'passenger': {
-                    'firstName': 'George',
-                    'lastName': 'Bush'
-                 },
-                'checkinDocuments': [{
-                    'boardingGroupNumber': '01',
-                    'boardingGroup': 'A',
-                    'documentType': 'BOARDING_PASS',
-                    'origin': 'AUS',
-                    'destination': 'LAS',
-                    'flightNumber': '4242'
-                }]
-            }]
-        }
         self.first_name = "George"
         self.last_name = "Bush"
         self.confirmation_number = "ABC123"
+        self.email = "gwb@example.com"
 
     @mock.patch('lib.swa._make_request')
     def test_check_in_call(self, mock_make_request):
-        swa.check_in(self.first_name, self.last_name, self.confirmation_number)
+        swa.check_in(self.names, self.confirmation_number)
         mock_make_request.assert_called_with(
             "/reservations/record-locator/ABC123/boarding-passes",
             self.data,
@@ -95,30 +84,12 @@ class TestCheckIn(unittest.TestCase):
         responses.add(
             responses.POST,
             'https://api-extensions.southwest.com/v1/mobile/reservations/record-locator/ABC123/boarding-passes',
-            json=self.successful_check_in_response,
+            json=util.load_fixture('check_in_success'),
             status=200
         )
-        result = swa.check_in(self.first_name, self.last_name, self.confirmation_number)
-        assert self.successful_check_in_response == result
-
-    def test_get_check_in_time(self):
-        departure_time = "2017-02-09T07:50:00.000-06:00"
-        expected = "2017-02-08T07:50:00.000-06:00"
-
-        result = swa._get_check_in_time(departure_time)
-        assert str(result) == "2017-02-08T07:50:00-06:00"
-
-    def test_get_check_in_times_from_reservation(self):
-        pass
-
-
-class TestReservation(unittest.TestCase):
-
-    def setUp(self):
-        self.first_name = "George"
-        self.last_name = "Bush"
-        self.confirmation_number = "ABC123"
-        self.email = "gwb@example.com"
+        result = swa.check_in(self.names, self.confirmation_number)
+        assert result['passengerCheckInDocuments'][0]['passenger']['firstName'] == "GEORGE"
+        assert result['passengerCheckInDocuments'][0]['passenger']['lastName'] == "BUSH"
 
     @mock.patch('lib.swa._make_request')
     def test_email_boarding_pass(self, mock_make_request):
@@ -130,48 +101,44 @@ class TestReservation(unittest.TestCase):
             'emailAddress': 'gwb@example.com'
         }
 
-        swa.email_boarding_pass(self.first_name, self.last_name, self.confirmation_number, self.email)
+        swa.email_boarding_pass(self.names, self.confirmation_number, self.email)
         mock_make_request.assert_called_with(
             "/record-locator/ABC123/operation-infos/mobile-boarding-pass/notifications",
             fake_data,
             "application/vnd.swacorp.com.mobile.notifications-v1.0+json"
         )
 
-    @mock.patch('lib.swa._make_request')
-    def test_get_reservation_call(self, mock_make_request):
-        fake_data = {
-            'action': 'VIEW',
-            'first-name': 'George',
-            'last-name': 'Bush'
-        }
 
-        swa.get_reservation(self.first_name, self.last_name, self.confirmation_number)
-        mock_make_request.assert_called_with(
-            "/reservations/record-locator/ABC123",
-            fake_data,
-            "application/vnd.swacorp.com.mobile.reservations-v1.0+json",
-            method='get'
-        )
 
-    # This test is pretty pointless since we never really interact after the request is made
+class TestReservation(unittest.TestCase):
+
     @responses.activate
-    def test_get_reservation_success(self):
-        fake_response = {
-            'itinerary': {
-                'originationDestinations': [{
-                    'segments': [{
-                        'departureDateTime': '2016-04-16T10:05:00.000-05:00'
-                    }]
-                }]
-            }
-        }
+    def test_from_passenger_info(self):
         responses.add(
             responses.GET,
             'https://api-extensions.southwest.com/v1/mobile/reservations/record-locator/ABC123',
-            json=fake_response,
+            json=util.load_fixture('get_reservation'),
             status=200
         )
+        r = swa.Reservation.from_passenger_info("George", "Bush", "ABC123")
+        assert isinstance(r, swa.Reservation)
 
-        result = swa.get_reservation(self.first_name, self.last_name, self.confirmation_number)
+    def test_passengers(self):
+        fixture = util.load_fixture('get_reservation')
+        expected = [{"firstName": "GEORGE", "lastName": "BUSH"}]
+        r = swa.Reservation(fixture)
+        assert r.passengers == expected
 
-        assert result == fake_response
+    def test_multiple_passengers(self):
+        fixture = util.load_fixture('get_multi_passenger_reservation')
+        expected = [
+            {"firstName": "GEORGE", "lastName": "BUSH"},
+            {"firstName": "LAURA", "lastName": "BUSH"}
+        ]
+        r = swa.Reservation(fixture)
+        assert r.passengers == expected
+
+    def test_check_in_times(self):
+        fixture = util.load_fixture('get_reservation')
+        r = swa.Reservation(fixture)
+        assert r.check_in_times == ['2017-08-21T07:35:00-05:00', '2017-08-17T18:50:00-05:00']

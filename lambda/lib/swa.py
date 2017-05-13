@@ -14,6 +14,68 @@ USER_AGENT = "Southwest/3.3.7 (iPhone; iOS 9.3; Scale/2.00)"
 API_KEY = "l7xx8d8bfce4ee874269bedc02832674129b"
 
 
+class Reservation():
+    def __init__(self, data):
+        self.data = data
+
+    @classmethod
+    def from_passenger_info(cls, first_name, last_name, confirmation_number):
+        content_type = 'application/vnd.swacorp.com.mobile.reservations-v1.0+json'
+
+        data = {
+            'action': 'VIEW',
+            'first-name': first_name,
+            'last-name': last_name
+        }
+
+        response = _make_request(
+            '/reservations/record-locator/%s' % confirmation_number,
+            data,
+            content_type,
+            method="get"
+        )
+
+        return cls(response.json())
+
+    def _get_check_in_time(self, departure_time):
+        """
+        Receives a departure time in RFC3339 format:
+
+            2017-02-09T07:50:00.000-06:00
+
+        And returns the check in time (24 hours prior) as a pendulum time object
+        """
+        return pendulum.parse(departure_time).subtract(days=1)
+
+    @property
+    def check_in_times(self):
+        """
+        Return a sorted and reversed list of check-in times for a reservation as
+        RFC3339 timestamps.
+
+        Times are sorted and reversed so that the soonest check-in time may be
+        popped from the end of the list.
+        """
+
+        flights = self.data['itinerary']['originationDestinations']
+
+        times = [
+            self._get_check_in_time(flight['segments'][0]['departureDateTime'])
+            for flight in flights
+        ]
+
+        return list(map(str, reversed(sorted(times))))
+
+    @property
+    def passengers(self):
+        return [
+            dict(
+                firstName=p['secureFlightName']['firstName'],
+                lastName=p['secureFlightName']['lastName']
+            ) for p in self.data['passengers']
+        ]
+
+
 def _make_request(path, data, content_type, method='post', check_status_code=True):
     """
     Issue a request to the Southwest API
@@ -53,69 +115,11 @@ def _make_request(path, data, content_type, method='post', check_status_code=Tru
     return response
 
 
-def _get_check_in_time(departure_time):
-    """
-    Receives a departure time in RFC3339 format:
-
-        2017-02-09T07:50:00.000-06:00
-
-    And returns the check in time (24 hours prior) as a pendulum time object
-    """
-    return pendulum.parse(departure_time).subtract(days=1)
-
-
-def get_check_in_times_from_reservation(reservation):
-    """
-    Return a sorted and reversed list of check-in times for a reservation as
-    RFC3339 timestamps.
-
-    Times are sorted and reversed so that the soonest check-in time may be
-    popped from the end of the list.
-    """
-
-    flights = reservation['itinerary']['originationDestinations']
-
-    times = [
-        _get_check_in_time(flight['segments'][0]['departureDateTime'])
-        for flight in flights
-    ]
-
-    return list(map(str, reversed(sorted(times))))
-
-
-def get_reservation(first_name, last_name, confirmation_number):
-    """
-    Find detailed origin information from reservation via confirmation number,
-    first and last name
-    """
-    content_type = 'application/vnd.swacorp.com.mobile.reservations-v1.0+json'
-
-    data = {
-        'action': 'VIEW',
-        'first-name': first_name,
-        'last-name': last_name
-    }
-
-    response = _make_request(
-        '/reservations/record-locator/%s' % confirmation_number,
-        data,
-        content_type,
-        method="get"
-    )
-
-    reservation = response.json()
-
-    return reservation
-
-
-def check_in(first_name, last_name, confirmation_number):
+def check_in(names, confirmation_number):
     content_type = "application/vnd.swacorp.com.mobile.boarding-passes-v1.0+json"
 
     data = {
-        'names': [{
-            'firstName': first_name,
-            'lastName': last_name
-        }]
+        'names': names
     }
 
     response = _make_request(
@@ -129,14 +133,11 @@ def check_in(first_name, last_name, confirmation_number):
     return check_in_docs
 
 
-def email_boarding_pass(first_name, last_name, confirmation_number, email):
+def email_boarding_pass(names, confirmation_number, email):
     content_type = "application/vnd.swacorp.com.mobile.notifications-v1.0+json"
 
     data = {
-        'names': [{
-            'firstName': first_name,
-            'lastName': last_name
-        }],
+        'names': names,
         'emailAddress': email
     }
 

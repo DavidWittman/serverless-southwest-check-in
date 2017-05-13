@@ -58,19 +58,26 @@ def schedule_check_in(event, context):
     first_name = event['first_name']
     last_name = event['last_name']
     confirmation_number = event['confirmation_number']
-
-    event['check_in_times'] = {}
+    email = event['email']
 
     log.info("Looking up reservation {} for {} {}".format(confirmation_number,
                                                           first_name, last_name))
-    reservation = swa.get_reservation(first_name, last_name, confirmation_number)
+    reservation = swa.Reservation.from_passenger_info(
+        first_name, last_name, confirmation_number
+    )
     log.debug("Reservation: {}".format(reservation))
 
-    event['check_in_times']['remaining'] = \
-        swa.get_check_in_times_from_reservation(reservation)
+    result = {
+        'check_in_times': {
+            'remaining': reservation.check_in_times,
+        },
+        'passengers': reservation.passengers,
+        'confirmation_number': confirmation_number,
+        'email': email
+    }
 
     # Call ourself now that we have some check-in times.
-    return schedule_check_in(event, None)
+    return schedule_check_in(result, None)
 
 
 def check_in(event, context):
@@ -79,30 +86,35 @@ def check_in(event, context):
     the Southwest API and emails the reservation, if requested.
     """
 
-    first_name = event['first_name']
-    last_name = event['last_name']
     confirmation_number = event['confirmation_number']
-    email = event.get('email')
+    email = event['email']
 
-    log.info("Checking in {} {} ({})".format(first_name, last_name,
-                                             confirmation_number))
+    # Support older check-ins which did not support multiple passengers
+    if "passengers" in event:
+        passengers = event['passengers']
+    else:
+        passengers = [{
+            "firstName": event['first_name'],
+            "lastName": event['last_name']
+        }]
+
+    log.info("Checking in {} ({})".format(
+        passengers, confirmation_number
+    ))
 
     try:
-        resp = swa.check_in(first_name, last_name, confirmation_number)
-        log.info("Checked in {} {}!".format(first_name, last_name))
+        resp = swa.check_in(passengers, confirmation_number)
+        log.info("Checked in {} passengers!".format(len(passengers)))
         log.debug("Check-in response: {}".format(resp))
     except Exception as e:
         log.error("Error checking in: {}".format(e))
         raise
 
-    if email:
-        log.info("Emailing boarding pass to {}".format(email))
-        try:
-            swa.email_boarding_pass(
-                first_name, last_name, confirmation_number, email
-            )
-        except Exception as e:
-            log.error("Error emailing boarding pass: {}".format(e))
+    log.info("Emailing boarding passes to {}".format(email))
+    try:
+        swa.email_boarding_pass(passengers, confirmation_number, email)
+    except Exception as e:
+        log.error("Error emailing boarding pass: {}".format(e))
 
     # Raise exception to schedule the next check-in
     # This is caught by AWS Step and then schedule_check_in is called again

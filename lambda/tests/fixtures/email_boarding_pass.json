@@ -1,0 +1,11 @@
+{
+  "notifications": [
+    {
+      "messageId": "123456608",
+      "correlationId": 1,
+      "deliveryOption": "EMAIL",
+      "transactionId": "123456608",
+      "status": "SUCCESS"
+    }
+  ]
+}
