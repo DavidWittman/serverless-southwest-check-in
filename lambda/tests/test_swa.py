@@ -142,3 +142,8 @@ class TestReservation(unittest.TestCase):
         fixture = util.load_fixture('get_reservation')
         r = swa.Reservation(fixture)
         assert r.check_in_times == ['2099-08-21T07:35:00-05:00', '2099-08-17T18:50:00-05:00']
+
+    def test_confirmation_number(self):
+        fixture = util.load_fixture('get_reservation')
+        r = swa.Reservation(fixture)
+        assert r.confirmation_number == "ABC123"

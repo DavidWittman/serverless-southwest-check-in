@@ -17,6 +17,10 @@ API_KEY = "l7xx8d8bfce4ee874269bedc02832674129b"
 class Reservation():
     def __init__(self, data):
         self.data = data
+        self.confirmation_number = self.data['recordLocator']
+
+    def __repr__(self):
+        return "<Reservation {}>".format(self.confirmation_number)
 
     @classmethod
     def from_passenger_info(cls, first_name, last_name, confirmation_number):
