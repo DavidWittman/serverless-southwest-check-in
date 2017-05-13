@@ -59,18 +59,23 @@ def schedule_check_in(event, context):
     last_name = event['last_name']
     confirmation_number = event['confirmation_number']
 
-    event['check_in_times'] = {}
-
     log.info("Looking up reservation {} for {} {}".format(confirmation_number,
                                                           first_name, last_name))
-    reservation = swa.get_reservation(first_name, last_name, confirmation_number)
+    reservation = swa.Reservation.from_passenger_info(
+        first_name, last_name, confirmation_number
+    )
     log.debug("Reservation: {}".format(reservation))
 
-    event['check_in_times']['remaining'] = \
-        swa.get_check_in_times_from_reservation(reservation)
+    result = {
+        'check_in_times': {
+            'remaining': reservation.check_in_times,
+        },
+        'passengers': reservation.passengers,
+        'confirmation_number': confirmation_number
+    }
 
     # Call ourself now that we have some check-in times.
-    return schedule_check_in(event, None)
+    return schedule_check_in(result, None)
 
 
 def check_in(event, context):
