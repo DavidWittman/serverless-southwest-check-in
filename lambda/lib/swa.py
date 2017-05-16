@@ -47,9 +47,11 @@ class Reservation():
 
             2017-02-09T07:50:00.000-06:00
 
-        And returns the check in time (24 hours prior) as a pendulum time object
+        And returns the check in time (24 hours prior) as a pendulum time
+        object. One second is added to the checkin time, as it seems most
+        checkins which occur exactly on the minute fail.
         """
-        return pendulum.parse(departure_time).subtract(days=1)
+        return pendulum.parse(departure_time).subtract(days=1).add(seconds=1)
 
 
     @property
