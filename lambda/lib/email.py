@@ -72,13 +72,25 @@ def find_name_and_confirmation_number(msg):
         match = re.search(regex, msg.body())
 
         if match:
-            # TODO(dw): This makes assumptions about the name,
-            # specifically that the first word is their first name and the
-            # last word is their last name.
             log.debug("Passenger matched. Parsing first and last name")
             name_parts = match.group(1).strip().split(' ')
             fname, lname = name_parts[0], name_parts[-1]
 
+    elif "Ticketless Travel Passenger Itinerary" in msg.subject:
+        #
+        # AIR Confirmation: ABC123
+        # *Passenger(s)*
+        # BUSH/GEORGE W
+        #
+        log.debug("Found ticketless itinerary email: {}".format(msg.subject))
+        regex = r"AIR Confirmation:\s+([A-Z0-9]{6})\s+\*Passenger\(s\)\*\s+(\w+\/\w+)"
+        match = re.search(regex, msg.body())
+
+        if match:
+            log.debug("Passenger matched. Parsing first and last name")
+            reservation = match.group(1)
+            lname, fname = match.group(2).strip().split('/')
+            
     log.info("Passenger: {} {}, Confirmation Number: {}".format(
         fname, lname, reservation))
 
