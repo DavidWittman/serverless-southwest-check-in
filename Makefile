@@ -1,5 +1,8 @@
+plan:
+	terraform plan terraform/
+
 deploy: clean install_deps
-	terraform apply
+	terraform apply terraform/
 
 lint:
 	flake8 --max-line-length=120 lambda/*.py

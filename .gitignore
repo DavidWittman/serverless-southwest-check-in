@@ -5,3 +5,4 @@ terraform/build/
 lambda/vendor/
 *.tfstate
 *.tfstate.backup
+.terraform

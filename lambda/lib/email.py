@@ -90,7 +90,7 @@ def find_name_and_confirmation_number(msg):
             log.debug("Passenger matched. Parsing first and last name")
             reservation = match.group(1)
             lname, fname = match.group(2).strip().split('/')
-            
+
     log.info("Passenger: {} {}, Confirmation Number: {}".format(
         fname, lname, reservation))
 
