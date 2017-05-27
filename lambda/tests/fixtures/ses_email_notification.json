@@ -1,0 +1,129 @@
+{
+    "mail": {
+        "commonHeaders": {
+            "from": [
+                "\"Bush, George\" <gwb@example.com>"
+            ], 
+            "to": [
+                "\"checkin@example.com\" <checkin@example>"
+            ], 
+            "returnPath": "prvs=12348f0cd=gwb@example.com", 
+            "messageId": "<AB1C23D2-5144-4D73-9DF8-ABCD12C6553A@example.com>", 
+            "date": "Thu, 25 May 2017 15:26:28 +0000", 
+            "subject": "FW: Flight reservation (ABC123) | 12JUN17 | AUS-DCA | Bush/George"
+        }, 
+        "source": "prvs=31198f0cd=gwb@example.com", 
+        "timestamp": "2017-05-25T15:26:36.313Z", 
+        "destination": [
+            "checkin@example.com"
+        ], 
+        "headers": [
+            {
+                "name": "Return-Path", 
+                "value": "<prvs=31198f0cd=gwb@example.com>"
+            }, 
+            {
+                "name": "From", 
+                "value": "\"Bush, George\" <gwb@example.com>"
+            }, 
+            {
+                "name": "To", 
+                "value": "\"checkin@example.com\" <checkin@example.com>"
+            }, 
+            {
+                "name": "Subject", 
+                "value": "FW: Flight reservation (ABC123) | 12JUN17 | AUS-DCA | Bush/George"
+            }, 
+            {
+                "name": "Thread-Topic", 
+                "value": "Flight reservation (ABC123) | 12JUN17 | AUS-DCA | Bush/George"
+            }, 
+            {
+                "name": "Thread-Index", 
+                "value": "ABC1MF44ZoKfJ2irEOJZXwyi38skqIE2T2A"
+            }, 
+            {
+                "name": "Date", 
+                "value": "Thu, 25 May 2017 15:26:28 +0000"
+            }, 
+            {
+                "name": "Message-ID", 
+                "value": "<ED9E39E2-5144-4D73-9DF8-ABCD12C6553A@example.com>"
+            }, 
+            {
+                "name": "References", 
+                "value": "<0.0.F4.DAF.ABCD1215D52C4D0.0@omptrans.luv.southwest.com>"
+            }, 
+            {
+                "name": "In-Reply-To", 
+                "value": "<0.0.F4.DAF.ABCD1215D52C4D0.0@omptrans.luv.southwest.com>"
+            }, 
+            {
+                "name": "Accept-Language", 
+                "value": "en-US"
+            }, 
+            {
+                "name": "Content-Language", 
+                "value": "en-US"
+            }, 
+            {
+                "name": "X-MS-Has-Attach", 
+                "value": "yes"
+            }, 
+            {
+                "name": "X-MS-TNEF-Correlator", 
+                "value": ""
+            }, 
+            {
+                "name": "x-ms-exchange-messagesentrepresentingtype", 
+                "value": "1"
+            }, 
+            {
+                "name": "x-ms-exchange-transport-fromentityheader", 
+                "value": "Hosted"
+            }, 
+            {
+                "name": "x-originating-ip", 
+                "value": "[10.0.0.1]"
+            }, 
+            {
+                "name": "Content-Type", 
+                "value": "multipart/related; boundary=\"_004_ED9E39E251444D739DF8C475DDC6553Aexamplecom_\"; type=\"multipart/alternative\""
+            }, 
+            {
+                "name": "MIME-Version", 
+                "value": "1.0"
+            }, 
+            {
+                "name": "Precedence", 
+                "value": "Bulk"
+            }
+        ], 
+        "headersTruncated": false, 
+        "messageId": "b1uaklnocc0rlhlolwuto8oqghigbihmbs1p3bo1"
+    }, 
+    "receipt": {
+        "processingTimeMillis": 2211, 
+        "recipients": [
+            "checkin@example.com"
+        ], 
+        "action": {
+            "type": "Lambda", 
+            "invocationType": "Event", 
+            "functionArn": "arn:aws:lambda:us-east-1:123456789:function:sw-receive-email"
+        }, 
+        "timestamp": "2017-05-25T15:26:36.313Z", 
+        "spfVerdict": {
+            "status": "PASS"
+        }, 
+        "spamVerdict": {
+            "status": "PASS"
+        }, 
+        "virusVerdict": {
+            "status": "PASS"
+        }, 
+        "dkimVerdict": {
+            "status": "GRAY"
+        }
+    }
+}
