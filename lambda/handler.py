@@ -58,7 +58,7 @@ def schedule_check_in(event, context):
     first_name = event['first_name']
     last_name = event['last_name']
     confirmation_number = event['confirmation_number']
-    email = event['email']
+    email = event.get('email')
 
     log.info("Looking up reservation {} for {} {}".format(confirmation_number,
                                                           first_name, last_name))
@@ -162,8 +162,8 @@ def receive_email(event, context):
         return
 
     # Don't add the email if it's straight from southwest.com
-    if not ses_msg.source.endswith('southwest.com'):
-        reservation['email'] = ses_msg.source
+    if not ses_msg.from_email.endswith('southwest.com'):
+        reservation['email'] = ses_msg.from_email
 
     execution = sfn.start_execution(
         stateMachineArn=state_machine_arn,

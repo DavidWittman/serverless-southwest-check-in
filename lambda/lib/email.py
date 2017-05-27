@@ -14,9 +14,10 @@ log.setLevel(logging.DEBUG)
 class SesMailNotification(object):
     def __init__(self, data, s3_bucket=None):
         self.data = data
-        self.subject = data['commonHeaders']['subject']
+        self.headers = data['commonHeaders']
+        self.subject = self.headers['subject']
         self.source = data['source']
-        self.from_header = data['commonHeaders']['from']
+
         self.message_id = data['messageId']
         self._body = None
         # S3 bucket where SES messages are saved to
@@ -41,6 +42,24 @@ class SesMailNotification(object):
             self._body = obj['Body'].read().decode('utf-8')
 
         return self._body
+
+    @property
+    def from_email(self):
+        """
+        Cleans the return address provided in the "source" field of the SES
+        notification.
+
+        This is primarily used for stripping the BATV signatures, but can
+        potentially be used for other sanitizations in the future.
+        """
+
+        if self.source.startswith("prvs="):
+            # This is a BATV reply address; strip off everything before the
+            # prevs=TOKEN= prefix by finding the index of the second =
+            index = self.source.index("=", 5) + 1
+            return self.source[index:]
+
+        return self.source
 
 
 def find_name_and_confirmation_number(msg):
