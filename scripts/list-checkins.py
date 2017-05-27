@@ -6,11 +6,11 @@ import argparse
 import concurrent.futures
 import datetime
 import json
-import sys
 
 import boto3
 
 SFN = boto3.client('stepfunctions')
+
 
 def format_date_fields(obj):
     for key in obj:
@@ -18,11 +18,13 @@ def format_date_fields(obj):
             obj[key] = obj[key].isoformat()
     return obj
 
+
 def get_execution_details(execution_arn):
     e = SFN.describe_execution(executionArn=execution_arn)
     e = format_date_fields(e)
     del e['ResponseMetadata']
     return e
+
 
 def main(args):
     results = []
@@ -41,8 +43,9 @@ def main(args):
             futures.append(future)
         for future in concurrent.futures.as_completed(futures):
             results.append(future.result())
-             
+
     print(json.dumps(results))
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
