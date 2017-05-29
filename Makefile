@@ -10,7 +10,7 @@ lint:
 	flake8 --max-line-length=120 lambda/*.py
 
 test:
-	PYTHONPATH=lambda/tests:lambda python -m unittest test_swa test_handler
+	PYTHONPATH=lambda/tests:lambda python -m unittest test_swa test_handler test_email
 
 install_deps:
 	pip install -r lambda/requirements.txt -t lambda/vendor
