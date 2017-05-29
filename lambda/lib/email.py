@@ -62,7 +62,7 @@ class SesMailNotification(object):
         return self.source
 
 
-def send_confirmation_email(to, **kwargs):
+def send_confirmation(to, **kwargs):
     """
     Sends confirmation email via SES
     """
