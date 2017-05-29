@@ -30,6 +30,16 @@ $ export AWS_SECRET_ACCESS_KEY=YOUR_SECRET_KEY
 $ export AWS_DEFAULT_REGION=us-east-1
 ```
 
+### Initialize Terraform state
+
+Run the following command to configure Terraform's [Remote State](https://www.terraform.io/docs/state/remote.html) in S3.
+
+```
+$ terraform init terraform/
+```
+
+You will be prompted for an S3 location to store the remote statefile in. If you wish to use a local state, just remove `terraform/backend.tf` and rerun this command.
+
 ## Usage
 
 ### Deploy

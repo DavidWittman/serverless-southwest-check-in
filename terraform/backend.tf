@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
     encrypt = true
-    region = "us-east-1"
+    region  = "us-east-1"
   }
 }

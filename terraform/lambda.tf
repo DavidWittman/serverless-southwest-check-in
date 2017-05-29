@@ -29,6 +29,13 @@ resource "aws_lambda_function" "sw_schedule_check_in" {
   runtime          = "python2.7"
   timeout          = 10
   source_code_hash = "${data.archive_file.lambda.output_base64sha256}"
+
+  environment {
+    variables = {
+      EMAIL_SOURCE = "\"Checkin Bot\" <no-reply@${var.domain}>"
+      EMAIL_BCC = "${var.admin_email}"
+    }
+  }
 }
 
 resource "aws_lambda_function" "sw_check_in" {

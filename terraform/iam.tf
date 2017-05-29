@@ -56,6 +56,14 @@ resource "aws_iam_role_policy" "lambda" {
         "states:StartExecution"
       ],
       "Resource": "${aws_sfn_state_machine.check_in.id}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ses:SendEmail",
+        "ses:SendRawEmail"
+      ],
+      "Resource": "*"
     }
   ]
 }

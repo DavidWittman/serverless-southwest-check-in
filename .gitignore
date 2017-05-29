@@ -6,3 +6,4 @@ lambda/vendor/
 *.tfstate
 *.tfstate.backup
 .terraform
+terraform.tfvars

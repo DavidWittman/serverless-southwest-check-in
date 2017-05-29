@@ -1,8 +1,10 @@
 plan:
 	terraform plan terraform/
 
-deploy: clean install_deps
+apply:
 	terraform apply terraform/
+
+deploy: clean install_deps apply
 
 lint:
 	flake8 --max-line-length=120 lambda/*.py
@@ -17,4 +19,4 @@ clean:
 	-rm -rf lambda/vendor/
 	-find . -type f -name '*.pyc' -delete
 
-.PHONY: deploy lint test install_deps clean
+.PHONY: plan apply deploy lint test install_deps clean
