@@ -16,7 +16,7 @@ class TestScheduleCheckIn(unittest.TestCase):
             'first_name': 'George',
             'last_name': 'Bush',
             'confirmation_number': 'ABC123',
-            'email': 'gwb@aol.com'
+            'email': 'gwb@example.com'
         }
 
     @responses.activate
@@ -30,7 +30,7 @@ class TestScheduleCheckIn(unittest.TestCase):
                 'remaining': ['2099-08-21T07:35:01-05:00'],
                 'next': '2099-08-17T18:50:01-05:00'
             },
-            'email': 'gwb@aol.com'
+            'email': 'gwb@example.com'
         }
 
         responses.add(
@@ -55,7 +55,7 @@ class TestScheduleCheckIn(unittest.TestCase):
                 'remaining': ['2099-05-13T15:10:01-05:00'],
                 'next': '2099-05-12T08:55:01-05:00'
             },
-            'email': 'gwb@aol.com'
+            'email': 'gwb@example.com'
         }
 
         responses.add(
@@ -83,7 +83,7 @@ class TestCheckIn(unittest.TestCase):
                 'remaining': [],
                 'next': '2017-05-12T08:55:00-05:00'                                                                     
             },                                                                                                          
-            'email': 'gwb@aol.com'                                                                                      
+            'email': 'gwb@example.com'                                                                                      
         } 
 
         responses.add(
@@ -116,7 +116,7 @@ class TestCheckIn(unittest.TestCase):
                 'remaining': ['2017-05-13T15:10:00-05:00'],                                                             
                 'next': '2017-05-12T08:55:00-05:00'                                                                     
             },                                                                                                          
-            'email': 'gwb@aol.com'                                                                                      
+            'email': 'gwb@example.com'                                                                                      
         } 
 
         responses.add(
@@ -152,7 +152,7 @@ class TestCheckIn(unittest.TestCase):
                 'remaining': [],
                 'next': '2017-05-12T08:55:00-05:00'                                                                     
             },                                                                                                          
-            'email': 'gwb@aol.com'                                                                                      
+            'email': 'gwb@example.com'                                                                                      
         } 
 
         responses.add(

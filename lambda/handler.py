@@ -58,7 +58,7 @@ def schedule_check_in(event, context):
     first_name = event['first_name']
     last_name = event['last_name']
     confirmation_number = event['confirmation_number']
-    email = event.get('email')
+    email_address = event.get('email')
 
     log.info("Looking up reservation {} for {} {}".format(confirmation_number,
                                                           first_name, last_name))
@@ -73,8 +73,15 @@ def schedule_check_in(event, context):
         },
         'passengers': reservation.passengers,
         'confirmation_number': confirmation_number,
-        'email': email
+        'email': email_address
     }
+
+    # Send a confirmation email
+    if email_address:
+        try:
+            email.send_confirmation(email_address)
+        except Exception as e:
+            log.error("Error sending confirmation email: {}".format(e))
 
     # Call ourself now that we have some check-in times.
     return schedule_check_in(result, None)
