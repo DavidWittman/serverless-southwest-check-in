@@ -89,6 +89,12 @@ Alternatively, check-ins can be submitted via e-mail using the AWS SES Lambda Re
 Flight reservation (ABC123) | 25DEC17 | ABC-XYZ | LASTNAME/FIRSTNAME
 ```
 
+### Other
+
+#### Notifications
+
+An SNS topic `checkin-notifications` is created as part of the Terraform deploy, but you must manually create and attach a subscription to it through the SNS dashboard. See the Amazon documentation on how to [Subscribe to a Topic](https://docs.aws.amazon.com/sns/latest/dg/SubscribeTopic.html) for more information.
+
 ## Contributing
 
 ### Testing
