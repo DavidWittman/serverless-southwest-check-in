@@ -141,7 +141,13 @@ class TestReservation(unittest.TestCase):
     def test_check_in_times(self):
         fixture = util.load_fixture('get_reservation')
         r = swa.Reservation(fixture)
-        assert r.check_in_times == ['2099-08-21T07:35:01-05:00', '2099-08-17T18:50:01-05:00']
+        assert r.check_in_times == ['2099-08-21T07:35:05-05:00', '2099-08-17T18:50:05-05:00']
+
+    def test_check_in_times_alternate_second(self):
+        fixture = util.load_fixture('get_reservation')
+        r = swa.Reservation(fixture)
+        r.check_in_seconds = 42
+        assert r.check_in_times == ['2099-08-21T07:35:42-05:00', '2099-08-17T18:50:42-05:00']
 
     def test_confirmation_number(self):
         fixture = util.load_fixture('get_reservation')

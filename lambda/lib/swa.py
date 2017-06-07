@@ -18,6 +18,8 @@ class Reservation():
     def __init__(self, data):
         self.data = data
         self.confirmation_number = self.data['recordLocator']
+        # Second of the minute to use for check in times
+        self.check_in_seconds = 5
 
     def __repr__(self):
         return "<Reservation {}>".format(self.confirmation_number)
@@ -48,10 +50,12 @@ class Reservation():
             2017-02-09T07:50:00.000-06:00
 
         And returns the check in time (24 hours prior) as a pendulum time
-        object. One second is added to the checkin time, as it seems most
-        checkins which occur exactly on the minute fail.
+        object. `self.check_in_seconds` seconds (Default 5) are added to
+        the checkin time to allow for some clock skew buffer.
         """
-        return pendulum.parse(departure_time).subtract(days=1).add(seconds=1)
+        return pendulum.parse(departure_time)\
+                .subtract(days=1)\
+                .add(seconds=self.check_in_seconds)
 
 
     @property
