@@ -33,7 +33,7 @@ resource "aws_lambda_function" "sw_schedule_check_in" {
   environment {
     variables = {
       EMAIL_SOURCE = "\"Checkin Bot\" <no-reply@${var.domain}>"
-      EMAIL_BCC = "${var.admin_email}"
+      EMAIL_BCC    = "${var.admin_email}"
     }
   }
 }
@@ -49,7 +49,7 @@ resource "aws_lambda_function" "sw_check_in" {
 }
 
 resource "aws_lambda_permission" "allow_ses" {
-  statement_id   = "AllowExecutionFromSNS"
+  statement_id   = "AllowExecutionFromSES"
   action         = "lambda:InvokeFunction"
   function_name  = "${aws_lambda_function.sw_receive_email.function_name}"
   source_account = "${data.aws_caller_identity.current.account_id}"
