@@ -3,6 +3,7 @@ import os
 import re
 
 import boto3
+import pendulum
 
 from . import exceptions
 
@@ -62,7 +63,7 @@ class SesMailNotification(object):
         return self.source
 
 
-def send_confirmation(to, **kwargs):
+def send_confirmation(to, reservation, **kwargs):
     """
     Sends confirmation email via SES
     """
@@ -71,9 +72,17 @@ def send_confirmation(to, **kwargs):
     bcc = kwargs.get('bcc', os.environ.get('EMAIL_BCC'))
 
     subject = "Your checkin has been scheduled!"
-    body = ("Thanks for scheduling a checkin for your next flight. I will set "
-            "my alarm and wake up to check you in 24 hours before your "
-            "departure. Fly safe!")
+    body = (
+        "Thanks for scheduling a checkin for your flight. I will set "
+        "my alarm and wake up to check you in 24 hours before your "
+        "departure. Fly safe!\n\n"
+        "Confirmation Number: %s\n"
+        "Check-in times:\n"
+    ) % (reservation.confirmation_number)
+
+    for c in reservation.check_in_times:
+        pt = pendulum.parse(c)
+        body += " - {}\n".format(pt.to_day_datetime_string())
 
     msg = {
         'Subject': {
