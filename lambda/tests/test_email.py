@@ -6,6 +6,9 @@ import util
 
 from lib import email
 
+class FakeReservation(object):
+    confirmation_number = "ABC123"
+    check_in_times = ["2017-09-21T07:25:00.000-05:00", "2017-09-28T07:15:00.000-05:00"]
 
 class TestSesMailNotification(unittest.TestCase):
 
@@ -23,13 +26,16 @@ class TestSesMailNotification(unittest.TestCase):
 
 class TestSendEmail(unittest.TestCase):
 
+    def setUp(self):
+        self.reservation = FakeReservation()
+
     @mock.patch('boto3.client')
     def test_send_confirmation_destination(self, mock_client):
         ses_mock = mock.Mock()
         mock_client.return_value = ses_mock
         expected_destination = {'ToAddresses': ['gwb@example.com']}
 
-        email.send_confirmation("gwb@example.com")
+        email.send_confirmation("gwb@example.com", self.reservation)
         assert ses_mock.send_email.call_args[1]['Destination'] == expected_destination
 
     @mock.patch('boto3.client')
@@ -38,5 +44,5 @@ class TestSendEmail(unittest.TestCase):
         mock_client.return_value = ses_mock
         expected_destination = {'ToAddresses': ['gwb@example.com'], 'BccAddresses': ['bcc@example.com']}
 
-        email.send_confirmation("gwb@example.com", bcc="bcc@example.com")
+        email.send_confirmation("gwb@example.com", self.reservation, bcc="bcc@example.com")
         assert ses_mock.send_email.call_args[1]['Destination'] == expected_destination

@@ -79,7 +79,7 @@ def schedule_check_in(event, context):
     # Send a confirmation email
     if email_address:
         try:
-            email.send_confirmation(email_address)
+            email.send_confirmation(email_address, reservation=reservation)
         except Exception as e:
             log.warn("Unable to send confirmation email: {}".format(e))
 
