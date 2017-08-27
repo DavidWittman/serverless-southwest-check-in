@@ -1,0 +1,11 @@
+# Domains to create the Checkin Bot on
+# All of these domains should already have a Route53 Hosted Zone created.
+domains = ["example.com", "subdomain.example.com"]
+
+recipients = [
+    "bot@example.com",  # Accept emails for bot@example.com
+    "alpha.example.com" # Accept all email addresses @alpha.example.com
+]
+
+# This email address receives email notifications from the app
+admin_email = "admin@mail.example.com"

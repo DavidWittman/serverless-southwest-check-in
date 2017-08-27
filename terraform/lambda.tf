@@ -32,7 +32,7 @@ resource "aws_lambda_function" "sw_schedule_check_in" {
 
   environment {
     variables = {
-      EMAIL_SOURCE = "\"Checkin Bot\" <no-reply@${var.domain}>"
+      EMAIL_SOURCE = "\"Checkin Bot\" <no-reply@${var.domains[0]}>"
       EMAIL_BCC    = "${var.admin_email}"
     }
   }
