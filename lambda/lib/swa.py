@@ -9,9 +9,9 @@ import requests
 from . import exceptions
 
 BASE_URL = "https://api-extensions.southwest.com/v1/mobile"
-USER_AGENT = "Southwest/3.3.7 (iPhone; iOS 9.3; Scale/2.00)"
+USER_AGENT = "Southwest/4.9.1 CFNetwork/887 Darwin/17.0.0"
 # This is not a secret. Well, not my secret at least.
-API_KEY = "l7xx8d8bfce4ee874269bedc02832674129b"
+API_KEY = "l7xxc981db8c38c84a3ea0a0c677ec2fc021"
 
 
 class Reservation():
