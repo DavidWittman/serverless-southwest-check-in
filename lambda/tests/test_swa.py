@@ -12,9 +12,9 @@ from lib import swa
 class TestRequest(unittest.TestCase):
     def test_make_request_get(self, mock_requests):
         expected_headers = {
-            "User-Agent": "Southwest/3.3.7 (iPhone; iOS 9.3; Scale/2.00)",
+            "User-Agent": "Southwest/4.9.1 CFNetwork/887 Darwin/17.0.0",
             "Content-Type": "application/vnd.swacorp.com.mobile.boarding-passes-v1.0+json",
-            "X-Api-Key": "l7xx8d8bfce4ee874269bedc02832674129b",
+            "X-Api-Key": "l7xxc981db8c38c84a3ea0a0c677ec2fc021",
             "Accept-Language": "en-US;q=1"
         }
         expected_url = "https://api-extensions.southwest.com/v1/mobile/foo/123456/bar"
@@ -31,9 +31,9 @@ class TestRequest(unittest.TestCase):
 
     def test_make_request_post(self, mock_requests):
         expected_headers = {
-            "User-Agent": "Southwest/3.3.7 (iPhone; iOS 9.3; Scale/2.00)",
+            "User-Agent": "Southwest/4.9.1 CFNetwork/887 Darwin/17.0.0",
             "Content-Type": "application/vnd.swacorp.com.mobile.boarding-passes-v1.0+json",
-            "X-Api-Key": "l7xx8d8bfce4ee874269bedc02832674129b",
+            "X-Api-Key": "l7xxc981db8c38c84a3ea0a0c677ec2fc021",
             "Accept-Language": "en-US;q=1"
         }
         expected_url = "https://api-extensions.southwest.com/v1/mobile/foo/123456/bar"
