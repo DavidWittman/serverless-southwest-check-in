@@ -58,8 +58,7 @@ class Reservation():
                 .add(seconds=self.check_in_seconds)
 
 
-    @property
-    def check_in_times(self, expired=False):
+    def get_check_in_times(self, expired=False):
         """
         Return a sorted and reversed list of check-in times for a reservation as
         RFC3339 timestamps. By default, only future checkin times are returned.
@@ -81,6 +80,10 @@ class Reservation():
             times = filter(lambda x: x > pendulum.now(), times)
 
         return list(map(str, reversed(sorted(times))))
+
+    @property
+    def check_in_times(self):
+        return self.get_check_in_times()
 
     @property
     def passengers(self):
