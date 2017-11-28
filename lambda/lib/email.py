@@ -80,7 +80,7 @@ def send_confirmation(to, reservation, **kwargs):
         "Check-in times:\n"
     ) % (reservation.confirmation_number)
 
-    for c in reservation.check_in_times:
+    for c in reversed(reservation.check_in_times):
         pt = pendulum.parse(c)
         body += " - {}\n".format(pt.to_day_datetime_string())
 
