@@ -77,7 +77,7 @@ class Reservation():
 
         # Remove expired checkins from results
         if not expired:
-            times = filter(lambda x: x > pendulum.now(), times)
+            times = [t for t in times if t > pendulum.now()]
 
         return list(map(str, reversed(sorted(times))))
 
