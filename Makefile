@@ -1,3 +1,6 @@
+init:
+	terraform init terraform/
+
 plan:
 	terraform plan terraform/
 
@@ -19,4 +22,4 @@ clean:
 	-rm -rf lambda/vendor/
 	-find . -type f -name '*.pyc' -delete
 
-.PHONY: plan apply deploy lint test install_deps clean
+.PHONY: init plan apply deploy lint test install_deps clean
