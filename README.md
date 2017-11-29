@@ -4,7 +4,7 @@
 
 Automatically check in to your Southwest flight using the AWS Serverless Platform.
 
-This project was inspired by similar projects from [Aaron Ortbals](https://github.com/aortbals/southwest-checkin) and [Joe Beda](https://github.com/jbeda/southwest-checkin).
+This project was inspired by similar projects from Aaron Ortbals and [Joe Beda](https://github.com/jbeda/southwest-checkin).
 
 ## Quickstart
 
