@@ -19,8 +19,9 @@ class TestScheduleCheckIn(unittest.TestCase):
             'email': 'gwb@example.com'
         }
 
+    @mock.patch('handler.email.send_confirmation')
     @responses.activate
-    def test_schedule_check_in(self):
+    def test_schedule_check_in(self, email_mock):
         expected = {
             'passengers': [
                 {"firstName": "GEORGE", "lastName": "BUSH"}
@@ -43,8 +44,9 @@ class TestScheduleCheckIn(unittest.TestCase):
         result = handler.schedule_check_in(self.mock_event, None)
         assert result == expected
 
+    @mock.patch('handler.email.send_confirmation')
     @responses.activate
-    def test_schedule_multi_passenger_check_in(self):
+    def test_schedule_multi_passenger_check_in(self, email_mock):
         expected = {
             'passengers': [
                 {"firstName": "GEORGE", "lastName": "BUSH"},
