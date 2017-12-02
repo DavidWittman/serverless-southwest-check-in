@@ -9,7 +9,7 @@ resource "aws_lambda_function" "sw_receive_email" {
   function_name    = "sw-receive-email"
   role             = "${aws_iam_role.lambda.arn}"
   handler          = "handler.receive_email"
-  runtime          = "python2.7"
+  runtime          = "python3.6"
   timeout          = 10
   source_code_hash = "${data.archive_file.lambda.output_base64sha256}"
 
@@ -26,7 +26,7 @@ resource "aws_lambda_function" "sw_schedule_check_in" {
   function_name    = "sw-schedule-check-in"
   role             = "${aws_iam_role.lambda.arn}"
   handler          = "handler.schedule_check_in"
-  runtime          = "python2.7"
+  runtime          = "python3.6"
   timeout          = 10
   source_code_hash = "${data.archive_file.lambda.output_base64sha256}"
 
@@ -43,7 +43,7 @@ resource "aws_lambda_function" "sw_check_in" {
   function_name    = "sw-check-in"
   role             = "${aws_iam_role.lambda.arn}"
   handler          = "handler.check_in"
-  runtime          = "python2.7"
+  runtime          = "python3.6"
   timeout          = 15
   source_code_hash = "${data.archive_file.lambda.output_base64sha256}"
 }
