@@ -17,6 +17,8 @@ resource "aws_lambda_function" "sw_receive_email" {
     variables = {
       S3_BUCKET_NAME    = "${aws_s3_bucket.email.id}"
       STATE_MACHINE_ARN = "${aws_sfn_state_machine.check_in.id}"
+      EMAIL_SOURCE = "\"Checkin Bot\" <no-reply@${var.domains[0]}>"
+      EMAIL_BCC    = "${var.admin_email}"
     }
   }
 }
