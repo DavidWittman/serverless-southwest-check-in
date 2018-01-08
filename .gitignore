@@ -7,3 +7,4 @@ lambda/vendor/
 *.tfstate.backup
 .terraform
 terraform.tfvars
+build/

@@ -63,26 +63,13 @@ class SesMailNotification(object):
         return self.source
 
 
-def send_confirmation(to, reservation, **kwargs):
+def send_ses_email(to, subject, body, **kwargs):
     """
-    Sends confirmation email via SES
+    Sends an email via SES
     """
 
     source = kwargs.get('source', os.environ.get('EMAIL_SOURCE'))
     bcc = kwargs.get('bcc', os.environ.get('EMAIL_BCC'))
-
-    subject = "Your checkin has been scheduled!"
-    body = (
-        "Thanks for scheduling a checkin for your flight. I will set "
-        "my alarm and wake up to check you in 24 hours before your "
-        "departure. Fly safe!\n\n"
-        "Confirmation Number: %s\n"
-        "Check-in times:\n"
-    ) % (reservation.confirmation_number)
-
-    for c in reversed(reservation.check_in_times):
-        pt = pendulum.parse(c)
-        body += " - {}\n".format(pt.to_day_datetime_string())
 
     msg = {
         'Subject': {
@@ -102,14 +89,53 @@ def send_confirmation(to, reservation, **kwargs):
         destination['BccAddresses'] = [bcc]
 
     ses = boto3.client('ses')
-
-    log.info("Sending confirmation email to {}".format(to))
+    log.info("Sending email to {}".format(to))
 
     return ses.send_email(
         Source=source,
         Destination=destination,
         Message=msg
     )
+
+
+def send_confirmation(to, reservation):
+    """
+    Sends an email confirming that the user's checkin has been scheduled
+    """
+
+    subject = "Your checkin has been scheduled!"
+    body = (
+        "Thanks for scheduling a checkin for your flight. I will set "
+        "my alarm and wake up to check you in 24 hours before your "
+        "departure. Fly safe!\n\n"
+        "Confirmation Number: %s\n"
+        "Check-in times:\n"
+    ) % (reservation.confirmation_number)
+
+    for c in reversed(reservation.check_in_times):
+        pt = pendulum.parse(c)
+        body += " - {}\n".format(pt.to_day_datetime_string())
+
+    return send_ses_email(to, subject, body)
+
+
+def send_failure_notification(to):
+    """
+    Sends an email when scheduling fails. This usually happens when the email
+    format is unrecognized or if there is a problem with the reservation.
+    """
+
+    subject = "Error scheduling your checkin"
+    body = (
+        "There was an error scheduling a checkin for your flight. This usually happens when "
+        "I don't recognize the type of email which you sent me. For the best results, forward "
+        "the \"Flight reservation\" emails which are sent immediately after booking the flight. "
+        "It looks like this:\n\n"
+        "    > Flight reservation (ABC123) | 25DEC18 | MDW-LAX | Smith/John\n\n"
+        "When your flight is successfully scheduled, I will send you a friendly email confirming "
+        "your checkin times."
+    )
+    return send_ses_email(to, subject, body)
 
 
 def find_name_and_confirmation_number(msg):
