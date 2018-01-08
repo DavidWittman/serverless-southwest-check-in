@@ -3,12 +3,12 @@ resource "aws_s3_bucket" "email" {
   acl    = "private"
 
   lifecycle_rule {
-    id      = "expire-14-days"
+    id      = "expire-90-days"
     enabled = true
     prefix  = ""
 
     expiration {
-      days = 14
+      days = 90
     }
   }
 
