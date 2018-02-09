@@ -171,7 +171,7 @@ def find_name_and_confirmation_number(msg):
             name_parts = match.group(1).strip().split(' ')
             fname, lname = name_parts[0], name_parts[-1]
 
-    elif "Ticketless Travel Passenger Itinerary" in msg.subject:
+    elif "Passenger Itinerary" in msg.subject:
         #
         # AIR Confirmation: ABC123
         # *Passenger(s)*
