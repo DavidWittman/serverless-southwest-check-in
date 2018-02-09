@@ -2,9 +2,13 @@ import unittest
 
 import mock
 
+from collections import namedtuple
+
 import util
 
 from lib import email
+
+FakeEmail = namedtuple('Email', 'subject message_id')
 
 class FakeReservation(object):
     confirmation_number = "ABC123"
@@ -39,7 +43,6 @@ class TestSendEmail(unittest.TestCase):
         email.send_confirmation("gwb@example.com", self.reservation)
         assert ses_mock.send_email.call_args[1]['Destination'] == expected_destination
 
-
     @mock.patch('boto3.client')
     def test_send_ses_email(self, mock_client):
         ses_mock = mock.Mock()
@@ -65,7 +68,6 @@ class TestSendEmail(unittest.TestCase):
         assert ses_mock.send_email.call_args[1]['Destination'] == expected_destination
         assert ses_mock.send_email.call_args[1]['Message'] == expected_msg
 
-
     @mock.patch('boto3.client')
     def test_send_ses_email_bcc_destination(self, mock_client):
         ses_mock = mock.Mock()
@@ -75,3 +77,15 @@ class TestSendEmail(unittest.TestCase):
         email.send_ses_email("gwb@example.com", "fake subject", "fake body", bcc="bcc@example.com")
 
         assert ses_mock.send_email.call_args[1]['Destination'] == expected_destination
+
+    def test_find_name_and_confirmation_number(self):
+        e = FakeEmail('Fwd: Flight reservation (ABC123) | 25FEB18 | AUS-TUL | Bush/George', 0)
+        expected = dict(first_name="George", last_name="Bush", confirmation_number="ABC123")
+        result = email.find_name_and_confirmation_number(e)
+        assert result == expected
+
+    def test_find_name_with_space_and_confirmation_number(self):
+        e = FakeEmail('Fwd: Flight reservation (ABC123) | 25FEB18 | AUS-TUL | Mc Lovin/Steven', 0)
+        expected = dict(first_name="Steven", last_name="Mc Lovin", confirmation_number="ABC123")
+        result = email.find_name_and_confirmation_number(e)
+        assert result == expected

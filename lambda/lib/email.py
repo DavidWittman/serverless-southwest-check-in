@@ -147,7 +147,7 @@ def find_name_and_confirmation_number(msg):
     fname, lname, reservation = None, None, None
 
     # Try to match `(5OK3YZ) | 22APR17 | HOU-MDW | Bush/George`
-    match = re.search(r"\(([A-Z0-9]{6})\).*\| (\w+\/\w+)", msg.subject)
+    match = re.search(r"\(([A-Z0-9]{6})\).*\| (\w+ ?\w+\/\w+)", msg.subject)
 
     if match:
         log.debug("Found a reservation email: {}".format(msg.subject))
@@ -186,11 +186,11 @@ def find_name_and_confirmation_number(msg):
             reservation = match.group(1)
             lname, fname = match.group(2).strip().split('/')
 
-    log.info("Passenger: {} {}, Confirmation Number: {}".format(
-        fname, lname, reservation))
-
     if not all([fname, lname, reservation]):
         raise exceptions.ReservationNotFoundError("Unable to find reservation "
             "in email id {}".format(msg.message_id))
+
+    log.info("Passenger: {} {}, Confirmation Number: {}".format(
+        fname, lname, reservation))
 
     return dict(first_name=fname, last_name=lname, confirmation_number=reservation)
