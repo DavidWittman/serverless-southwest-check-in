@@ -130,7 +130,7 @@ def send_failure_notification(to):
         "There was an error scheduling a checkin for your flight. This usually happens when "
         "I don't recognize the type of email which you sent me. For the best results, forward "
         "the \"Flight reservation\" email which is sent immediately after booking the flight. "
-        "It looks like this:\n\n"
+        "The subject of the email looks like this:\n\n"
         "    > Flight reservation (ABC123) | 25DEC18 | MDW-LAX | Smith/John\n\n"
         "When your flight is successfully scheduled, I will send you a friendly email confirming "
         "your checkin times."
