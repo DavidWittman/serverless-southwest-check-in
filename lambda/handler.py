@@ -166,7 +166,8 @@ def receive_email(event, context):
         log.info("Found reservation: {}".format(reservation))
     except Exception as e:
         log.error("Error scraping email {}: {}".format(ses_msg.message_id, e))
-        email.send_failure_notification(ses_msg.from_email)
+        if not ses_msg.from_email.endswith('southwest.com'):
+            email.send_failure_notification(ses_msg.from_email)
         return False
 
     # Don't add the email if it's straight from southwest.com
