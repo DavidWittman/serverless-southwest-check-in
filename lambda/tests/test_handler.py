@@ -28,8 +28,8 @@ class TestScheduleCheckIn(unittest.TestCase):
             ],
             'confirmation_number': 'ABC123',
             'check_in_times': {
-                'remaining': ['2099-08-21T07:35:05-05:00'],
-                'next': '2099-08-17T18:50:05-05:00'
+                'remaining': ['2099-08-21T07:35:03-05:00'],
+                'next': '2099-08-17T18:50:03-05:00'
             },
             'email': 'gwb@example.com'
         }
@@ -54,8 +54,8 @@ class TestScheduleCheckIn(unittest.TestCase):
             ],
             'confirmation_number': 'ABC123',
             'check_in_times': {
-                'remaining': ['2099-05-13T15:10:05-05:00'],
-                'next': '2099-05-12T08:55:05-05:00'
+                'remaining': ['2099-05-13T15:10:03-05:00'],
+                'next': '2099-05-12T08:55:03-05:00'
             },
             'email': 'gwb@example.com'
         }

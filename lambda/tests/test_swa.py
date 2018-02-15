@@ -141,19 +141,19 @@ class TestReservation(unittest.TestCase):
     def test_check_in_times(self):
         fixture = util.load_fixture('get_reservation')
         r = swa.Reservation(fixture)
-        assert r.check_in_times == ['2099-08-21T07:35:05-05:00', '2099-08-17T18:50:05-05:00']
+        assert r.check_in_times == ['2099-08-21T07:35:03-05:00', '2099-08-17T18:50:03-05:00']
 
     def test_check_in_times_no_expired(self):
         # The get_active_reservation fixture contains one flight leg which has already occurred
         fixture = util.load_fixture('get_active_reservation')
         r = swa.Reservation(fixture)
-        assert r.check_in_times == ['2099-08-21T07:35:05-05:00']
+        assert r.check_in_times == ['2099-08-21T07:35:03-05:00']
 
     def test_get_check_in_times_with_expired(self):
         # The get_active_reservation fixture contains one flight leg which has already occurred
         fixture = util.load_fixture('get_active_reservation')
         r = swa.Reservation(fixture)
-        assert r.get_check_in_times(expired=True) == ['2099-08-21T07:35:05-05:00', '1999-08-17T18:50:05-05:00']
+        assert r.get_check_in_times(expired=True) == ['2099-08-21T07:35:03-05:00', '1999-08-17T18:50:03-05:00']
 
     def test_check_in_times_alternate_second(self):
         fixture = util.load_fixture('get_reservation')
