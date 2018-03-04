@@ -7,6 +7,7 @@ resource "aws_cloudwatch_metric_alarm" "checkin_errors" {
   namespace           = "AWS/Lambda"
   period              = "300"
   statistic           = "Maximum"
+  treat_missing_data  = "ignore"
 
   # Set this threshold to 3 because we normally have _some_ retries due to races with Southwest's clock
   threshold = "3"
@@ -28,6 +29,7 @@ resource "aws_cloudwatch_metric_alarm" "checkin_schedule_errors" {
   period              = "300"
   statistic           = "Maximum"
   threshold           = "1"
+  treat_missing_data  = "ignore"
 
   dimensions {
     FunctionName = "${aws_lambda_function.sw_schedule_check_in.function_name}"
@@ -46,6 +48,7 @@ resource "aws_cloudwatch_metric_alarm" "checkin_receive_email_errors" {
   period              = "300"
   statistic           = "Maximum"
   threshold           = "1"
+  treat_missing_data  = "ignore"
 
   dimensions {
     FunctionName = "${aws_lambda_function.sw_receive_email.function_name}"
