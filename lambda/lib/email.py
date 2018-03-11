@@ -109,8 +109,8 @@ def send_confirmation(to, reservation):
         "my alarm and wake up to check you in 24 hours before your "
         "departure.\n\n"
         "The boarding position which you receive is based on the number of Early Bird passengers on your flight. "
-        "80% of checkins are in position B15 or better, which almost guarantees you won't be stuck with a middle seat. "
-        "Enjoy your flight!\n\n"
+        "80%% of checkins are in position B15 or better, which almost guarantees you won't be stuck with a "
+        "middle seat. Enjoy your flight!\n\n"
         "Confirmation Number: %s\n"
         "Check-in times:\n"
     ) % (reservation.confirmation_number)
