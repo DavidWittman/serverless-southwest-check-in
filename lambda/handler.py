@@ -135,7 +135,7 @@ def _get_sfn_execution_name(reservation):
     first and last name follwed by a UUID
     """
     name = "{}-{}-{}".format(
-        reservation['last_name'].lower(),
+        reservation['last_name'].lower().replace(' ', '-'),
         reservation['first_name'].lower(),
         uuid.uuid4()
     )
