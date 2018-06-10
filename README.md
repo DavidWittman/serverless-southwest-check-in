@@ -60,7 +60,15 @@ Terraform will prompt you to provide a domain name of an existing Route53 Hosted
 
 ### Add a flight
 
-New flights can be added by executing the AWS Step Function or by an SES (email) trigger.
+New flights can be added by an SES email trigger or by manually executing an AWS Step Function.
+
+#### Add via Email
+
+Forward your reservation email to `checkin@$DOMAIN` where domain is the Route53 domain used when deploying the application. The reservation email is sent by Southwest at purchase time and should be in the form:
+
+```
+Flight reservation (ABC123) | 25DEC17 | ABC-XYZ | LASTNAME/FIRSTNAME
+```
 
 #### Manually execute Step Function
 
@@ -80,14 +88,6 @@ aws stepfunctions start-execution \
 ```
 
 The `email` parameter is optional and sets the email address to which your boarding passes will be sent.
-
-#### Add via Email
-
-Alternatively, check-ins can be submitted via e-mail using the AWS SES Lambda Receiver Action. To submit check-ins this way, just forward your reservation email to `checkin@$DOMAIN` where domain is the Route53 domain used when deploying the application. The reservation email is sent by Southwest at purchase time and should be in the form:
-
-```
-Flight reservation (ABC123) | 25DEC17 | ABC-XYZ | LASTNAME/FIRSTNAME
-```
 
 ### Other
 
