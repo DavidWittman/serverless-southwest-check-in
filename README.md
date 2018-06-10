@@ -2,9 +2,9 @@
 
 [![Build Status](https://travis-ci.org/DavidWittman/serverless-southwest-check-in.svg?branch=master)](https://travis-ci.org/DavidWittman/serverless-southwest-check-in)
 
-Automatically check in to your Southwest flight using the AWS Serverless Platform.
+Serverless Southwest Check In is an email bot which will automatically check you into your Southwest flights. Never sit in a middle seat again!
 
-This project was inspired by similar projects from Aaron Ortbals and [Joe Beda](https://github.com/jbeda/southwest-checkin).
+This project is powered by the AWS Serverless Platform (Lambda, Step Functions, and SES) and was inspired by similar projects from Aaron Ortbals and [Joe Beda](https://github.com/jbeda/southwest-checkin).
 
 ## Quickstart
 
