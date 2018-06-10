@@ -64,7 +64,7 @@ New flights can be added by an SES email trigger or by manually executing an AWS
 
 #### Add via Email
 
-Forward your reservation email to `checkin@$DOMAIN` where domain is the Route53 domain used when deploying the application. The reservation email is sent by Southwest at purchase time and should be in the form:
+Forward your reservation email to `checkin@$DOMAIN`, where `$DOMAIN` is the Route53 domain used when deploying the application. The reservation email is sent by Southwest at purchase time and should be in the form:
 
 ```
 Flight reservation (ABC123) | 25DEC17 | ABC-XYZ | LASTNAME/FIRSTNAME
