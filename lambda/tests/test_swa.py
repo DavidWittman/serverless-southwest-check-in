@@ -1,4 +1,3 @@
-import codecs
 import unittest
 
 import mock
@@ -15,7 +14,7 @@ class TestRequest(unittest.TestCase):
         expected_headers = {
             "User-Agent": "Southwest/4.9.1 CFNetwork/887 Darwin/17.0.0",
             "Content-Type": "application/vnd.swacorp.com.mobile.boarding-passes-v1.0+json",
-            "X-Api-Key": codecs.decode("y7kk82o3qo91r6624pp1n690305qqo21279n", "rot13"),
+            "X-Api-Key": swa.API_KEY,
             "Accept-Language": "en-US;q=1"
         }
         expected_url = "https://api-extensions.southwest.com/v1/mobile/foo/123456/bar"
@@ -34,7 +33,7 @@ class TestRequest(unittest.TestCase):
         expected_headers = {
             "User-Agent": "Southwest/4.9.1 CFNetwork/887 Darwin/17.0.0",
             "Content-Type": "application/vnd.swacorp.com.mobile.boarding-passes-v1.0+json",
-            "X-Api-Key": codecs.decode("y7kk82o3qo91r6624pp1n690305qqo21279n", "rot13"),
+            "X-Api-Key": swa.API_KEY,
             "Accept-Language": "en-US;q=1"
         }
         expected_url = "https://api-extensions.southwest.com/v1/mobile/foo/123456/bar"
