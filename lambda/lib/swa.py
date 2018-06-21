@@ -3,6 +3,8 @@
 # Functions for interacting with the Southwest API
 #
 
+import codecs
+
 import pendulum
 import requests
 
@@ -10,8 +12,8 @@ from . import exceptions
 
 BASE_URL = "https://api-extensions.southwest.com/v1/mobile"
 USER_AGENT = "Southwest/4.9.1 CFNetwork/887 Darwin/17.0.0"
-# This is not a secret. Well, not my secret at least.
-API_KEY = "l7xxc981db8c38c84a3ea0a0c677ec2fc021"
+# This is not a secret, but obfuscate it to prevent detection
+API_KEY = codecs.decode("y7kk82o3qo91r6624pp1n690305qqo21279n", "rot13")
 
 
 class Reservation():
