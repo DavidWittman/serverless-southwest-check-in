@@ -130,6 +130,9 @@ def _make_request(path, data, content_type, method='post', check_status_code=Tru
         except:
             msg = response.reason
 
+        if response.status_code == 404:
+            raise exceptions.ReservationCancelledError()
+
         raise exceptions.SouthwestAPIError("status_code={} msg=\"{}\"".format(
             response.status_code, msg))
 
