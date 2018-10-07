@@ -5,7 +5,7 @@ import responses
 
 import util
 
-from lib import swa
+from lib import swa, exceptions
 
 
 @mock.patch('lib.swa.requests')
@@ -90,6 +90,17 @@ class TestCheckIn(unittest.TestCase):
         result = swa.check_in(self.names, self.confirmation_number)
         assert result['passengerCheckInDocuments'][0]['passenger']['firstName'] == "GEORGE"
         assert result['passengerCheckInDocuments'][0]['passenger']['lastName'] == "BUSH"
+
+    @responses.activate
+    def test_check_in_reservation_cancelled(self):
+        responses.add(
+            responses.POST,
+            'https://api-extensions.southwest.com/v1/mobile/reservations/record-locator/ABC123/boarding-passes',
+            json=util.load_fixture('check_in_reservation_cancelled'),
+            status=404
+        )
+        with self.assertRaises(exceptions.ReservationCancelledError):
+            result = swa.check_in(self.names, self.confirmation_number)
 
     @mock.patch('lib.swa._make_request')
     def test_email_boarding_pass(self, mock_make_request):

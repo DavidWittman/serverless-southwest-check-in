@@ -113,6 +113,9 @@ def check_in(event, context):
         resp = swa.check_in(passengers, confirmation_number)
         log.info("Checked in {} passengers!".format(len(passengers)))
         log.debug("Check-in response: {}".format(resp))
+    except exceptions.ReservationCancelledError:
+        log.error("Reservation {} has been cancelled".format(confirmation_number))
+        return False
     except Exception as e:
         log.error("Error checking in: {}".format(e))
         raise
@@ -125,8 +128,11 @@ def check_in(event, context):
 
     # Raise exception to schedule the next check-in
     # This is caught by AWS Step and then schedule_check_in is called again
+    # TODO(dw): I think there are better looping primitives in AWS Step now
     if len(event['check_in_times']['remaining']) > 0:
         raise exceptions.NotLastCheckIn()
+
+    return True
 
 
 def _get_sfn_execution_name(reservation):

@@ -1,3 +1,4 @@
+import logging
 import unittest
 
 import mock
@@ -7,6 +8,9 @@ import handler
 import util
 
 from lib import exceptions
+
+# Prevent the handler function from logging during test runs
+logging.disable(logging.CRITICAL)
 
 
 class TestScheduleCheckIn(unittest.TestCase):
@@ -75,18 +79,18 @@ class TestCheckIn(unittest.TestCase):
 
     @responses.activate
     def test_multi_passenger_check_in(self):
-        fake_event = {                                                                                                    
-            'passengers': [                                                                                             
+        fake_event = {
+            'passengers': [
                 {"firstName": "GEORGE", "lastName": "BUSH"},
                 {"firstName": "LAURA", "lastName": "BUSH"},
-            ],                                                                                                          
-            'confirmation_number': 'ABC123',                                                                            
-            'check_in_times': {                                                                                         
+            ],
+            'confirmation_number': 'ABC123',
+            'check_in_times': {
                 'remaining': [],
-                'next': '2017-05-12T08:55:00-05:00'                                                                     
-            },                                                                                                          
-            'email': 'gwb@example.com'                                                                                      
-        } 
+                'next': '2017-05-12T08:55:00-05:00'
+            },
+            'email': 'gwb@example.com'
+        }
 
         responses.add(
             responses.POST,
@@ -104,22 +108,22 @@ class TestCheckIn(unittest.TestCase):
             status=200
         )
 
-        result = handler.check_in(fake_event, None)
+        assert(handler.check_in(fake_event, None))
 
     @responses.activate
     def test_not_last_check_in(self):
-        fake_event = {                                                                                                    
-            'passengers': [                                                                                             
+        fake_event = {
+            'passengers': [
                 {"firstName": "GEORGE", "lastName": "BUSH"},
                 {"firstName": "LAURA", "lastName": "BUSH"},
-            ],                                                                                                          
-            'confirmation_number': 'ABC123',                                                                            
-            'check_in_times': {                                                                                         
-                'remaining': ['2017-05-13T15:10:00-05:00'],                                                             
-                'next': '2017-05-12T08:55:00-05:00'                                                                     
-            },                                                                                                          
-            'email': 'gwb@example.com'                                                                                      
-        } 
+            ],
+            'confirmation_number': 'ABC123',
+            'check_in_times': {
+                'remaining': ['2017-05-13T15:10:00-05:00'],
+                'next': '2017-05-12T08:55:00-05:00'
+            },
+            'email': 'gwb@example.com'
+        }
 
         responses.add(
             responses.POST,
@@ -142,20 +146,20 @@ class TestCheckIn(unittest.TestCase):
             assert False, "NotLastCheckIn exception was not raised"
         except exceptions.NotLastCheckIn:
             pass
-            
+
 
     @responses.activate
     def test_old_format_check_in(self):
-        fake_event = {                                                                                                    
+        fake_event = {
             'first_name': "GEORGE",
             'last_name': "BUSH",
-            'confirmation_number': 'ABC123',                                                                            
-            'check_in_times': {                                                                                         
+            'confirmation_number': 'ABC123',
+            'check_in_times': {
                 'remaining': [],
-                'next': '2017-05-12T08:55:00-05:00'                                                                     
-            },                                                                                                          
-            'email': 'gwb@example.com'                                                                                      
-        } 
+                'next': '2017-05-12T08:55:00-05:00'
+            },
+            'email': 'gwb@example.com'
+        }
 
         responses.add(
             responses.POST,
@@ -173,7 +177,30 @@ class TestCheckIn(unittest.TestCase):
             status=200
         )
 
-        result = handler.check_in(fake_event, None)
+        assert(handler.check_in(fake_event, None))
+
+    @responses.activate
+    def test_cancelled_check_in(self):
+        fake_event = {
+            'first_name': "GEORGE",
+            'last_name': "BUSH",
+            'confirmation_number': 'ABC123',
+            'check_in_times': {
+                'remaining': [],
+                'next': '2017-05-12T08:55:00-05:00'
+            },
+            'email': 'gwb@example.com'
+        }
+
+        responses.add(
+            responses.POST,
+            'https://api-extensions.southwest.com/v1/mobile/reservations/'
+            'record-locator/ABC123/boarding-passes',
+            json=util.load_fixture('check_in_reservation_cancelled'),
+            status=404
+        )
+
+        assert(handler.check_in(fake_event, None) == False)
 
     @responses.activate
     def test_failed_check_in(self):
