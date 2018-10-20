@@ -190,10 +190,11 @@ def find_name_and_confirmation_number(msg):
             lname, fname = match.group(2).strip().split('/')
 
     elif "Your reservation is confirmed." in msg.subject:
-        match = re.search(r"\(([A-Z0-9]{6})\)", msg.subject)
+        match = re.search(r"(\w+) (\w+ ?\w+)'s.*\(([A-Z0-9]{6})\)", msg.subject)
         if match:
-            reservation = match.group(1)
-        # TODO(dw): Parse fname, lname from email body
+            fname = match.group(1)
+            lname = match.group(2)
+            reservation = match.group(3)
 
     if not all([fname, lname, reservation]):
         raise exceptions.ReservationNotFoundError("Unable to find reservation "
