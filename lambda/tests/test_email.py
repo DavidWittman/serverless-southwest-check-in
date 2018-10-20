@@ -116,3 +116,9 @@ class TestSendEmail(unittest.TestCase):
         expected = dict(first_name="Steve", last_name="Mc Lovin", confirmation_number="ABC123")
         result = email.find_name_and_confirmation_number(e)
         assert result == expected
+
+    def test_find_name_and_confirmation_number_shortcut(self):
+        e = FakeEmail('ABC123 George Bush', 0)
+        expected = dict(first_name="George", last_name="Bush", confirmation_number="ABC123")
+        result = email.find_name_and_confirmation_number(e)
+        assert result == expected

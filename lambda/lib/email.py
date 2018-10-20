@@ -108,9 +108,9 @@ def send_confirmation(to, reservation):
         "Thanks for scheduling a checkin for your flight. I will set "
         "my alarm and wake up to check you in 24 hours before your "
         "departure.\n\n"
-        "The boarding position which you receive is based on the number of Early Bird passengers on your flight. "
-        "80%% of checkins are in position B15 or better, which almost guarantees you won't be stuck with a "
-        "middle seat. Enjoy your flight!\n\n"
+        "The boarding position which you receive is based on the number of Early Bird "
+        "and A-List passengers on your flight. 80%% of checkins are in position B15 or "
+        "better, which almost guarantees you won't be stuck with a middle seat. Enjoy your flight!\n\n"
         "Confirmation Number: %s\n"
         "Check-in times:\n"
     ) % (reservation.confirmation_number)
@@ -132,9 +132,14 @@ def send_failure_notification(to):
     body = (
         "There was an error scheduling a checkin for your flight. This usually happens when "
         "I don't recognize the type of email which you sent me. For the best results, forward "
-        "the \"Flight reservation\" email which is sent immediately after booking the flight. "
-        "The subject of the email looks like this:\n\n"
-        "    > Flight reservation (ABC123) | 25DEC18 | MDW-LAX | Smith/John\n\n"
+        "the flight reservation email which is sent immediately after booking the flight. "
+        "The subject of the email will usually look like one of the following:\n\n"
+        "    > Flight reservation (ABC123) | 25DEC18 | MDW-LAX | Smith/John\n"
+        "    > Jane Smith's 12/25 Los Angeles trip (ABC123): Your reservation is confirmed.\n\n"
+        "If you're still having problems or your email doesn't resemble either of these formats, "
+        "send an empty email to me with the following subject line, filling in your name and "
+        "confirmation number:\n\n"
+        "    > ABC123 John Smith\n\n"
         "When your flight is successfully scheduled, I will send you a friendly email confirming "
         "your checkin times."
     )
@@ -195,6 +200,14 @@ def find_name_and_confirmation_number(msg):
             fname = match.group(1)
             lname = match.group(2)
             reservation = match.group(3)
+
+    # ABC123 George Bush
+    # TODO: Doing this search twice is kind of silly
+    elif re.search(r"([A-Z0-9]{6})\s+(\w+) (\w+ ?\w+)", msg.subject):
+        match = re.search(r"([A-Z0-9]{6})\s+(\w+) (\w+ ?\w+)", msg.subject)
+        reservation = match.group(1)
+        fname = match.group(2)
+        lname = match.group(3)
 
     if not all([fname, lname, reservation]):
         raise exceptions.ReservationNotFoundError("Unable to find reservation "
