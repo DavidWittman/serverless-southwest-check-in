@@ -8,7 +8,14 @@ import util
 
 from lib import email
 
-FakeEmail = namedtuple('Email', 'subject message_id')
+class FakeEmail(object):
+    def __init__(self, subject, message_id, body=""):
+        self.subject = subject
+        self.message_id = message_id
+        self.body = body
+
+    def body():
+        return self.body
 
 class FakeReservation(object):
     confirmation_number = "ABC123"
@@ -87,5 +94,31 @@ class TestSendEmail(unittest.TestCase):
     def test_find_name_with_space_and_confirmation_number(self):
         e = FakeEmail('Fwd: Flight reservation (ABC123) | 25FEB18 | AUS-TUL | Mc Lovin/Steven', 0)
         expected = dict(first_name="Steven", last_name="Mc Lovin", confirmation_number="ABC123")
+        result = email.find_name_and_confirmation_number(e)
+        assert result == expected
+
+    def test_find_new_reservation_email(self):
+        e = FakeEmail(
+            'Fwd: George Bush\'s 12/25 Boston Logan trip (ABC123): Your reservation is confirmed.',
+            0,
+            util.load_fixture('new_reservation_email')
+        )
+        expected = dict(first_name="George", last_name="Bush", confirmation_number="ABC123")
+        result = email.find_name_and_confirmation_number(e)
+        assert result == expected
+
+    def test_find_new_reservation_email_with_space(self):
+        e = FakeEmail(
+            'Fwd: Steve Mc Lovin\'s 12/25 Boston Logan trip (ABC123): Your reservation is confirmed.',
+            0,
+            util.load_fixture('new_reservation_email')
+        )
+        expected = dict(first_name="Steve", last_name="Mc Lovin", confirmation_number="ABC123")
+        result = email.find_name_and_confirmation_number(e)
+        assert result == expected
+
+    def test_find_name_and_confirmation_number_shortcut(self):
+        e = FakeEmail('ABC123 George Bush', 0)
+        expected = dict(first_name="George", last_name="Bush", confirmation_number="ABC123")
         result = email.find_name_and_confirmation_number(e)
         assert result == expected
