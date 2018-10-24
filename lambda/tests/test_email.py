@@ -98,14 +98,17 @@ class TestSendEmail(unittest.TestCase):
         assert result == expected
 
     def test_find_new_reservation_email(self):
-        e = FakeEmail(
+        test_subjects = [
             'Fwd: George Bush\'s 12/25 Boston Logan trip (ABC123): Your reservation is confirmed.',
-            0,
-            util.load_fixture('new_reservation_email')
-        )
-        expected = dict(first_name="George", last_name="Bush", confirmation_number="ABC123")
-        result = email.find_name_and_confirmation_number(e)
-        assert result == expected
+            'George Bush\'s 12/25 Boston Logan trip (ABC123): Your change is confirmed.',
+            'George Bush\'s 12/25 Boston Logan trip (ABC123)'
+        ]
+
+        for subject in test_subjects:
+            e = FakeEmail(subject, 0, util.load_fixture('new_reservation_email'))
+            expected = dict(first_name="George", last_name="Bush", confirmation_number="ABC123")
+            result = email.find_name_and_confirmation_number(e)
+            assert result == expected
 
     def test_find_new_reservation_email_with_space(self):
         e = FakeEmail(
