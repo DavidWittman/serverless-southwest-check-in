@@ -194,7 +194,9 @@ def find_name_and_confirmation_number(msg):
             reservation = match.group(1)
             lname, fname = match.group(2).strip().split('/')
 
-    elif "Your reservation is confirmed." in msg.subject:
+    # George Bush's 12/25 Detroit trip (ABC123)
+    # TODO: Doing this search twice is kind of silly
+    elif re.search(r"(\w+) (\w+ ?\w+)'s.*\(([A-Z0-9]{6})\)", msg.subject):
         match = re.search(r"(\w+) (\w+ ?\w+)'s.*\(([A-Z0-9]{6})\)", msg.subject)
         if match:
             fname = match.group(1)
