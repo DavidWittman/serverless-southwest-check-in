@@ -101,7 +101,10 @@ class TestSendEmail(unittest.TestCase):
         test_subjects = [
             'Fwd: George Bush\'s 12/25 Boston Logan trip (ABC123): Your reservation is confirmed.',
             'George Bush\'s 12/25 Boston Logan trip (ABC123): Your change is confirmed.',
-            'George Bush\'s 12/25 Boston Logan trip (ABC123)'
+            'George Bush\'s 12/25 Boston Logan trip (ABC123)',
+            "George Walker Bush's 12/25 Boston Logan trip (ABC123)",
+            "George W Bush's 12/25 Boston Logan trip (ABC123)",
+            "George W JR Bush's 12/25 Detroit trip (ABC123)"
         ]
 
         for subject in test_subjects:
@@ -109,16 +112,6 @@ class TestSendEmail(unittest.TestCase):
             expected = dict(first_name="George", last_name="Bush", confirmation_number="ABC123")
             result = email.find_name_and_confirmation_number(e)
             assert result == expected
-
-    def test_find_new_reservation_email_with_space(self):
-        e = FakeEmail(
-            'Fwd: Steve Mc Lovin\'s 12/25 Boston Logan trip (ABC123): Your reservation is confirmed.',
-            0,
-            util.load_fixture('new_reservation_email')
-        )
-        expected = dict(first_name="Steve", last_name="Mc Lovin", confirmation_number="ABC123")
-        result = email.find_name_and_confirmation_number(e)
-        assert result == expected
 
     def test_find_name_and_confirmation_number_shortcut(self):
         e = FakeEmail('ABC123 George Bush', 0)
