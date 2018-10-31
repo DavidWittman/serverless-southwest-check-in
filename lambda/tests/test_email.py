@@ -99,12 +99,16 @@ class TestSendEmail(unittest.TestCase):
 
     def test_find_new_reservation_email(self):
         test_subjects = [
+            'fwd: George Bush\'s 12/25 Boston Logan trip (ABC123): Your reservation is confirmed.',
             'Fwd: George Bush\'s 12/25 Boston Logan trip (ABC123): Your reservation is confirmed.',
-            'George Bush\'s 12/25 Boston Logan trip (ABC123): Your change is confirmed.',
-            'George Bush\'s 12/25 Boston Logan trip (ABC123)',
-            "George Walker Bush's 12/25 Boston Logan trip (ABC123)",
-            "George W Bush's 12/25 Boston Logan trip (ABC123)",
-            "George W JR Bush's 12/25 Detroit trip (ABC123)"
+            'George Bush\'s 12/25 Boston Logan trip (ABC123): Your change is confirmed.'
+            'George Bush\'s 12/25 Detroit trip (ABC123)',
+            'George Walker Bush\'s 12/25 Detroit trip (ABC123)',
+            'George W Bush\'s 12/25 Detroit trip (ABC123)',
+            'George W JR Bush\'s 12/25 Detroit trip (ABC123)',
+            'George W. Bush\'s 12/25 Detroit trip (ABC123)',
+            'George W Jr. Bush\'s 12/25 Detroit trip (ABC123)',
+            'George W. Jr. Bush\'s 12/25 Detroit trip (ABC123)'
         ]
 
         for subject in test_subjects:

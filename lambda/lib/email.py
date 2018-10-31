@@ -157,12 +157,17 @@ def find_name_and_confirmation_number(msg):
     # Try to match `(5OK3YZ) | 22APR17 | HOU-MDW | Bush/George`
     legacy_email_subject_match = re.search(r"\(([A-Z0-9]{6})\).*\| (\w+ ?\w+\/\w+)", msg.subject)
 
-    # George Bush's 12/25 Detroit trip (ABC123)
-    # George W Bush's 12/25 Detroit trip (ABC123)
+    # fwd: George Bush's 12/25 Boston Logan trip (ABC123)
+    # Fwd: George Bush's 12/25 Boston Logan trip (ABC123)
     # George Walker Bush's 12/25 Detroit trip (ABC123)
-    # George W Jr Bush's 12/25 Detroit trip (ABC123)
-    # Always creates 5 capture groups: first name, middle name, suffix, last name, reservation
-    new_email_subject_match = re.search(r"(\w+) *(\w+)? *(\w+)? (\w+)'s.*\(([A-Z0-9]{6})\)", msg.subject)
+    # George W Bush's 12/25 Detroit trip (ABC123)
+    # George W JR Bush's 12/25 Detroit trip (ABC123)
+    # George Bush's 12/25 Detroit trip (ABC123)
+    # Steve Mc Lovin's 12/25 Boston Logan trip (ABC123)
+    # George W. Bush's 12/25 Detroit trip (ABC123)
+    # George W Jr. Bush's 12/25 Detroit trip (ABC123)
+    # George W. Jr. Bush's 12/25 Detroit trip (ABC123)
+    new_email_subject_match = re.search(r"[Ffwd:]* *(\w+)* *\w*.*\w*.* (\w+)'s.*\(([A-Z0-9]{6})\)", msg.subject)
 
     # ABC123 George Bush
     manual_email_subject_match = re.search(r"([A-Z0-9]{6})\s+(\w+) (\w+ ?\w+)", msg.subject)
@@ -207,10 +212,8 @@ def find_name_and_confirmation_number(msg):
     elif new_email_subject_match:
         log.debug("Found new email subject match: {}".format(msg.subject))
         fname = new_email_subject_match.group(1)
-        mname = new_email_subject_match.group(2)  # omit middle name
-        suffix = new_email_subject_match.group(3)  # omit suffix
-        lname = new_email_subject_match.group(4)
-        reservation = new_email_subject_match.group(5)
+        lname = new_email_subject_match.group(2)
+        reservation = new_email_subject_match.group(3)
 
     elif manual_email_subject_match:
         log.debug("Found manual email subject match: {}".format(msg.subject))
