@@ -155,12 +155,19 @@ def find_name_and_confirmation_number(msg):
     fname, lname, reservation = None, None, None
 
     # Try to match `(5OK3YZ) | 22APR17 | HOU-MDW | Bush/George`
-    match = re.search(r"\(([A-Z0-9]{6})\).*\| (\w+ ?\w+\/\w+)", msg.subject)
+    legacy_email_subject_match = re.search(r"\(([A-Z0-9]{6})\).*\| (\w+ ?\w+\/\w+)", msg.subject)
 
-    if match:
-        log.debug("Found a reservation email: {}".format(msg.subject))
-        reservation = match.group(1)
-        lname, fname = match.group(2).split('/')
+    # This matches a variety of new email formats which look like
+    # George Bush's 12/25 Detroit trip (ABC123)
+    new_email_subject_match = re.search(r"(?:[Ff]wd: )?(\w+).* (\w+)'s.*\(([A-Z0-9]{6})\)", msg.subject)
+
+    # ABC123 George Bush
+    manual_email_subject_match = re.search(r"([A-Z0-9]{6})\s+(\w+) (\w+ ?\w+)", msg.subject)
+
+    if legacy_email_subject_match:
+        log.debug("Found a legacy reservation email: {}".format(msg.subject))
+        reservation = legacy_email_subject_match.group(1)
+        lname, fname = legacy_email_subject_match.group(2).split('/')
 
     elif "Here's your itinerary!" in msg.subject:
         log.debug("Found an itinerary email: {}".format(msg.subject))
@@ -194,22 +201,17 @@ def find_name_and_confirmation_number(msg):
             reservation = match.group(1)
             lname, fname = match.group(2).strip().split('/')
 
-    # George Bush's 12/25 Detroit trip (ABC123)
-    # TODO: Doing this search twice is kind of silly
-    elif re.search(r"(\w+) (\w+ ?\w+)'s.*\(([A-Z0-9]{6})\)", msg.subject):
-        match = re.search(r"(\w+) (\w+ ?\w+)'s.*\(([A-Z0-9]{6})\)", msg.subject)
-        if match:
-            fname = match.group(1)
-            lname = match.group(2)
-            reservation = match.group(3)
+    elif new_email_subject_match:
+        log.debug("Found new email subject match: {}".format(msg.subject))
+        fname = new_email_subject_match.group(1)
+        lname = new_email_subject_match.group(2)
+        reservation = new_email_subject_match.group(3)
 
-    # ABC123 George Bush
-    # TODO: Doing this search twice is kind of silly
-    elif re.search(r"([A-Z0-9]{6})\s+(\w+) (\w+ ?\w+)", msg.subject):
-        match = re.search(r"([A-Z0-9]{6})\s+(\w+) (\w+ ?\w+)", msg.subject)
-        reservation = match.group(1)
-        fname = match.group(2)
-        lname = match.group(3)
+    elif manual_email_subject_match:
+        log.debug("Found manual email subject match: {}".format(msg.subject))
+        reservation = manual_email_subject_match.group(1)
+        fname = manual_email_subject_match.group(2)
+        lname = manual_email_subject_match.group(3)
 
     if not all([fname, lname, reservation]):
         raise exceptions.ReservationNotFoundError("Unable to find reservation "
