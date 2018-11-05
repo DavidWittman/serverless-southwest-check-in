@@ -115,7 +115,7 @@ class TestSendEmail(unittest.TestCase):
             e = FakeEmail(subject, 0, util.load_fixture('new_reservation_email'))
             expected = dict(first_name="George", last_name="Bush", confirmation_number="ABC123")
             result = email.find_name_and_confirmation_number(e)
-            assert result == expected
+            assert result == expected, "Failed subject: {}".format(subject)
 
     def test_find_name_and_confirmation_number_shortcut(self):
         e = FakeEmail('ABC123 George Bush', 0)
