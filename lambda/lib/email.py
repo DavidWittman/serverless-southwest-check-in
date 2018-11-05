@@ -157,17 +157,9 @@ def find_name_and_confirmation_number(msg):
     # Try to match `(5OK3YZ) | 22APR17 | HOU-MDW | Bush/George`
     legacy_email_subject_match = re.search(r"\(([A-Z0-9]{6})\).*\| (\w+ ?\w+\/\w+)", msg.subject)
 
-    # fwd: George Bush's 12/25 Boston Logan trip (ABC123)
-    # Fwd: George Bush's 12/25 Boston Logan trip (ABC123)
-    # George Walker Bush's 12/25 Detroit trip (ABC123)
-    # George W Bush's 12/25 Detroit trip (ABC123)
-    # George W JR Bush's 12/25 Detroit trip (ABC123)
+    # This matches a variety of new email formats which look like
     # George Bush's 12/25 Detroit trip (ABC123)
-    # Steve Mc Lovin's 12/25 Boston Logan trip (ABC123)
-    # George W. Bush's 12/25 Detroit trip (ABC123)
-    # George W Jr. Bush's 12/25 Detroit trip (ABC123)
-    # George W. Jr. Bush's 12/25 Detroit trip (ABC123)
-    new_email_subject_match = re.search(r"[Ffwd:]* *(\w+)* *\w*.*\w*.* (\w+)'s.*\(([A-Z0-9]{6})\)", msg.subject)
+    new_email_subject_match = re.search(r"(?:[Ff]wd: )?(\w+).* (\w+)'s.*\(([A-Z0-9]{6})\)", msg.subject)
 
     # ABC123 George Bush
     manual_email_subject_match = re.search(r"([A-Z0-9]{6})\s+(\w+) (\w+ ?\w+)", msg.subject)
