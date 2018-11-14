@@ -159,7 +159,7 @@ def find_name_and_confirmation_number(msg):
 
     # This matches a variety of new email formats which look like
     # George Bush's 12/25 Detroit trip (ABC123)
-    new_email_subject_match = re.search(r"(?:[Ff]wd: )?(\w+).* (\w+)'s.*\(([A-Z0-9]{6})\)", msg.subject)
+    new_email_subject_match = re.search(r"(?:[Ff]wd?: )?(\w+).* (\w+)'s.*\(([A-Z0-9]{6})\)", msg.subject)
 
     # ABC123 George Bush
     manual_email_subject_match = re.search(r"([A-Z0-9]{6})\s+(\w+) (\w+ ?\w+)", msg.subject)
