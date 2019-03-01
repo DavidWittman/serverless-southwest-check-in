@@ -40,7 +40,7 @@ class TestScheduleCheckIn(unittest.TestCase):
 
         responses.add(
             responses.GET,
-            'https://api-extensions.southwest.com/v1/mobile/reservations/record-locator/ABC123',
+            'https://mobile.southwest.com/api/extensions/v1/mobile/reservations/record-locator/ABC123',
             json=util.load_fixture('get_reservation'),
             status=200
         )
@@ -66,7 +66,7 @@ class TestScheduleCheckIn(unittest.TestCase):
 
         responses.add(
             responses.GET,
-            'https://api-extensions.southwest.com/v1/mobile/reservations/record-locator/ABC123',
+            'https://mobile.southwest.com/api/extensions/v1/mobile/reservations/record-locator/ABC123',
             json=util.load_fixture('get_multi_passenger_reservation'),
             status=200
         )
@@ -94,7 +94,7 @@ class TestCheckIn(unittest.TestCase):
 
         responses.add(
             responses.POST,
-            'https://api-extensions.southwest.com/v1/mobile/reservations/'
+            'https://mobile.southwest.com/api/extensions/v1/mobile/reservations/'
             'record-locator/ABC123/boarding-passes',
             json=util.load_fixture('check_in_success'),
             status=200
@@ -102,7 +102,7 @@ class TestCheckIn(unittest.TestCase):
 
         responses.add(
             responses.POST,
-            'https://api-extensions.southwest.com/v1/mobile/record-locator/'
+            'https://mobile.southwest.com/api/extensions/v1/mobile/record-locator/'
             'ABC123/operation-infos/mobile-boarding-pass/notifications',
             json=util.load_fixture('email_boarding_pass'),
             status=200
@@ -127,7 +127,7 @@ class TestCheckIn(unittest.TestCase):
 
         responses.add(
             responses.POST,
-            'https://api-extensions.southwest.com/v1/mobile/reservations/'
+            'https://mobile.southwest.com/api/extensions/v1/mobile/reservations/'
             'record-locator/ABC123/boarding-passes',
             json=util.load_fixture('check_in_success'),
             status=200
@@ -135,7 +135,7 @@ class TestCheckIn(unittest.TestCase):
 
         responses.add(
             responses.POST,
-            'https://api-extensions.southwest.com/v1/mobile/record-locator/'
+            'https://mobile.southwest.com/api/extensions/v1/mobile/record-locator/'
             'ABC123/operation-infos/mobile-boarding-pass/notifications',
             json=util.load_fixture('email_boarding_pass'),
             status=200
@@ -163,7 +163,7 @@ class TestCheckIn(unittest.TestCase):
 
         responses.add(
             responses.POST,
-            'https://api-extensions.southwest.com/v1/mobile/reservations/'
+            'https://mobile.southwest.com/api/extensions/v1/mobile/reservations/'
             'record-locator/ABC123/boarding-passes',
             json=util.load_fixture('check_in_success'),
             status=200
@@ -171,7 +171,7 @@ class TestCheckIn(unittest.TestCase):
 
         responses.add(
             responses.POST,
-            'https://api-extensions.southwest.com/v1/mobile/record-locator/'
+            'https://mobile.southwest.com/api/extensions/v1/mobile/record-locator/'
             'ABC123/operation-infos/mobile-boarding-pass/notifications',
             json=util.load_fixture('email_boarding_pass'),
             status=200
@@ -194,7 +194,7 @@ class TestCheckIn(unittest.TestCase):
 
         responses.add(
             responses.POST,
-            'https://api-extensions.southwest.com/v1/mobile/reservations/'
+            'https://mobile.southwest.com/api/extensions/v1/mobile/reservations/'
             'record-locator/ABC123/boarding-passes',
             json=util.load_fixture('check_in_reservation_cancelled'),
             status=404

@@ -10,7 +10,7 @@ import requests
 
 from . import exceptions
 
-BASE_URL = "https://api-extensions.southwest.com/v1/mobile"
+BASE_URL = "https://mobile.southwest.com/api/extensions/v1/mobile"
 USER_AGENT = "Southwest/4.9.1 CFNetwork/887 Darwin/17.0.0"
 # This is not a secret, but obfuscate it to prevent detection
 API_KEY = codecs.decode("y7kk82o3qo91r6624pp1n690305qqo21279n", "rot13")

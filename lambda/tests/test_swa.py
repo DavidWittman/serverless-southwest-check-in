@@ -17,7 +17,7 @@ class TestRequest(unittest.TestCase):
             "X-Api-Key": swa.API_KEY,
             "Accept-Language": "en-US;q=1"
         }
-        expected_url = "https://api-extensions.southwest.com/v1/mobile/foo/123456/bar"
+        expected_url = "https://mobile.southwest.com/api/extensions/v1/mobile/foo/123456/bar"
         fake_data = {}
 
         _ = swa._make_request(  # NOQA
@@ -36,7 +36,7 @@ class TestRequest(unittest.TestCase):
             "X-Api-Key": swa.API_KEY,
             "Accept-Language": "en-US;q=1"
         }
-        expected_url = "https://api-extensions.southwest.com/v1/mobile/foo/123456/bar"
+        expected_url = "https://mobile.southwest.com/api/extensions/v1/mobile/foo/123456/bar"
         fake_data = {}
 
         _ = swa._make_request(  # NOQA
@@ -83,7 +83,7 @@ class TestCheckIn(unittest.TestCase):
     def test_check_in_success(self):
         responses.add(
             responses.POST,
-            'https://api-extensions.southwest.com/v1/mobile/reservations/record-locator/ABC123/boarding-passes',
+            'https://mobile.southwest.com/api/extensions/v1/mobile/reservations/record-locator/ABC123/boarding-passes',
             json=util.load_fixture('check_in_success'),
             status=200
         )
@@ -95,7 +95,7 @@ class TestCheckIn(unittest.TestCase):
     def test_check_in_reservation_cancelled(self):
         responses.add(
             responses.POST,
-            'https://api-extensions.southwest.com/v1/mobile/reservations/record-locator/ABC123/boarding-passes',
+            'https://mobile.southwest.com/api/extensions/v1/mobile/reservations/record-locator/ABC123/boarding-passes',
             json=util.load_fixture('check_in_reservation_cancelled'),
             status=404
         )
@@ -127,7 +127,7 @@ class TestReservation(unittest.TestCase):
     def test_from_passenger_info(self):
         responses.add(
             responses.GET,
-            'https://api-extensions.southwest.com/v1/mobile/reservations/record-locator/ABC123',
+            'https://mobile.southwest.com/api/extensions/v1/mobile/reservations/record-locator/ABC123',
             json=util.load_fixture('get_reservation'),
             status=200
         )
