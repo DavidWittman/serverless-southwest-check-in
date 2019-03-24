@@ -53,7 +53,7 @@ $ make deploy
 Or, if you don't have make installed:
 
 ```
-$ pip install -r lambda/requirements.txt -t lambda/vendor && terraform apply terraform/
+$ pip install -r lambda/requirements.txt -t lambda/vendor/python && terraform apply terraform/
 ```
 
 Terraform will prompt you to provide a domain name of an existing Route53 Hosted Zone. The MX record for this domain name will be set to the SES SMTP receiver endpoints for your region, so choose a domain which you do not currently use to receive email. In the future, support will be added for subdomains and/or disabling the email receiver.
