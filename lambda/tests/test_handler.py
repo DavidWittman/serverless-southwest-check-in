@@ -141,7 +141,7 @@ class TestCheckIn(unittest.TestCase):
             status=200
         )
 
-        result = handler.check_in(fake_event, None)
+        result = check_in(fake_event, None)
         assert result == False, "check_in response was not False"
 
 

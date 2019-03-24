@@ -28,14 +28,16 @@ resource "aws_sfn_state_machine" "check_in" {
           "IntervalSeconds": 5,
           "MaxAttempts": 3
         }
-      ],
+      ]
     },
     "IsLastCheckIn": {
       "Type": "Choice",
       "Choices": [
-        "Variable": "$.is_last_check_in",
-        "BooleanEquals": false,
-        "Next": "ScheduleCheckIn"
+        {
+          "Variable": "$.is_last_check_in",
+          "BooleanEquals": false,
+          "Next": "ScheduleCheckIn"
+        }
       ],
       "Default": "Done"
     },

@@ -47,10 +47,8 @@ def main(event, context):
     except Exception as e:
         log.error("Error emailing boarding pass: {}".format(e))
 
-    # Raise exception to schedule the next check-in
-    # This is caught by AWS Step and then schedule_check_in is called again
-    # TODO(dw): I think there are better looping primitives in AWS Step now
+    # Return False to indicate that there are check-ins remaining
     if len(event['check_in_times']['remaining']) > 0:
-        raise exceptions.NotLastCheckIn()
+        return False
 
     return True
