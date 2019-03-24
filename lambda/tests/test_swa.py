@@ -99,7 +99,7 @@ class TestCheckIn(unittest.TestCase):
             json=util.load_fixture('check_in_reservation_cancelled'),
             status=404
         )
-        with self.assertRaises(exceptions.ReservationCancelledError):
+        with self.assertRaises(exceptions.ReservationNotFoundError):
             result = swa.check_in(self.names, self.confirmation_number)
 
     @mock.patch('lib.swa._make_request')
