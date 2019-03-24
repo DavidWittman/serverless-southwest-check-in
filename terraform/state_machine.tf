@@ -20,20 +20,29 @@ resource "aws_sfn_state_machine" "check_in" {
     "CheckIn": {
       "Type": "Task",
       "Resource": "${aws_lambda_function.sw_check_in.arn}",
+      "ResultPath": "$.is_last_check_in",
+      "Next": "IsLastCheckIn",
       "Retry": [
         {
           "ErrorEquals": ["SouthwestAPIError"],
           "IntervalSeconds": 5,
           "MaxAttempts": 3
         }
-      ],
-      "Catch": [
+      ]
+    },
+    "IsLastCheckIn": {
+      "Type": "Choice",
+      "Choices": [
         {
-          "ErrorEquals": ["NotLastCheckIn"],
-          "ResultPath": "$.not_last_check_in",
+          "Variable": "$.is_last_check_in",
+          "BooleanEquals": false,
           "Next": "ScheduleCheckIn"
         }
       ],
+      "Default": "Done"
+    },
+    "Done": {
+      "Type": "Pass",
       "End": true
     }
   }
