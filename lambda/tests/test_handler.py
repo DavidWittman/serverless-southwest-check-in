@@ -4,10 +4,10 @@ import unittest
 import mock
 import responses
 
-import handler
 import util
 
 from lib import exceptions
+from lib.handlers import receive_email, schedule_check_in, check_in
 
 # Prevent the handler function from logging during test runs
 logging.disable(logging.CRITICAL)
@@ -23,7 +23,7 @@ class TestScheduleCheckIn(unittest.TestCase):
             'email': 'gwb@example.com'
         }
 
-    @mock.patch('handler.email.send_confirmation')
+    @mock.patch('lib.email.send_confirmation')
     @responses.activate
     def test_schedule_check_in(self, email_mock):
         expected = {
@@ -45,10 +45,10 @@ class TestScheduleCheckIn(unittest.TestCase):
             status=200
         )
 
-        result = handler.schedule_check_in(self.mock_event, None)
+        result = schedule_check_in(self.mock_event, None)
         assert result == expected
 
-    @mock.patch('handler.email.send_confirmation')
+    @mock.patch('lib.email.send_confirmation')
     @responses.activate
     def test_schedule_multi_passenger_check_in(self, email_mock):
         expected = {
@@ -71,7 +71,7 @@ class TestScheduleCheckIn(unittest.TestCase):
             status=200
         )
 
-        result = handler.schedule_check_in(self.mock_event, None)
+        result = schedule_check_in(self.mock_event, None)
         assert result == expected
 
 
@@ -108,7 +108,7 @@ class TestCheckIn(unittest.TestCase):
             status=200
         )
 
-        assert(handler.check_in(fake_event, None))
+        assert(check_in(fake_event, None))
 
     @responses.activate
     def test_not_last_check_in(self):
@@ -142,7 +142,7 @@ class TestCheckIn(unittest.TestCase):
         )
 
         try:
-            result = handler.check_in(fake_event, None)
+            result = check_in(fake_event, None)
             assert False, "NotLastCheckIn exception was not raised"
         except exceptions.NotLastCheckIn:
             pass
@@ -177,7 +177,7 @@ class TestCheckIn(unittest.TestCase):
             status=200
         )
 
-        assert(handler.check_in(fake_event, None))
+        assert(check_in(fake_event, None))
 
     @responses.activate
     def test_cancelled_check_in(self):
@@ -200,7 +200,7 @@ class TestCheckIn(unittest.TestCase):
             status=404
         )
 
-        assert(handler.check_in(fake_event, None) == False)
+        assert(check_in(fake_event, None) == False)
 
     @responses.activate
     def test_failed_check_in(self):
