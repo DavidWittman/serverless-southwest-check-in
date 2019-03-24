@@ -7,7 +7,7 @@ plan:
 apply:
 	terraform apply terraform/
 
-deploy: clean install_deps apply
+deploy: clean lambda/vendor apply
 
 lint:
 	flake8 --max-line-length=120 lambda/*.py
@@ -15,11 +15,11 @@ lint:
 test:
 	cd lambda; python -m unittest discover tests
 
-install_deps:
+lambda/vendor: lambda/requirements.txt
 	pip install -r lambda/requirements.txt -t lambda/vendor
 
 clean:
 	-rm -rf lambda/vendor/
 	-find . -type f -name '*.pyc' -delete
 
-.PHONY: init plan apply deploy lint test install_deps clean
+.PHONY: init plan apply deploy lint test clean
