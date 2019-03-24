@@ -34,8 +34,8 @@ def main(event, context):
         resp = swa.check_in(passengers, confirmation_number)
         log.info("Checked in {} passengers!".format(len(passengers)))
         log.debug("Check-in response: {}".format(resp))
-    except exceptions.ReservationCancelledError:
-        log.error("Reservation {} has been cancelled".format(confirmation_number))
+    except exceptions.ReservationNotFoundError:
+        log.error("Reservation {} not found. It may have been cancelled".format(confirmation_number))
         return False
     except Exception as e:
         log.error("Error checking in: {}".format(e))
