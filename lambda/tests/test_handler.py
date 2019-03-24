@@ -141,11 +141,8 @@ class TestCheckIn(unittest.TestCase):
             status=200
         )
 
-        try:
-            result = check_in(fake_event, None)
-            assert False, "NotLastCheckIn exception was not raised"
-        except exceptions.NotLastCheckIn:
-            pass
+        result = handler.check_in(fake_event, None)
+        assert result == False, "check_in response was not False"
 
 
     @responses.activate
