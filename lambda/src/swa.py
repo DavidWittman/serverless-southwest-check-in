@@ -8,7 +8,7 @@ import codecs
 import pendulum
 import requests
 
-from . import exceptions
+import exceptions
 
 BASE_URL = "https://mobile.southwest.com/api/extensions/v1/mobile"
 USER_AGENT = "Southwest/4.9.1 CFNetwork/887 Darwin/17.0.0"

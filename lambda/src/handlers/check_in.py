@@ -1,7 +1,7 @@
 import logging
 import sys
 
-from lib import swa, exceptions  # NOQA
+import swa, exceptions
 
 # Set up logging
 log = logging.getLogger(__name__)

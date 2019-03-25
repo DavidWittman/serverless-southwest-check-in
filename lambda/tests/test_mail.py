@@ -6,7 +6,7 @@ from collections import namedtuple
 
 import util
 
-from lib import email
+import mail
 
 class FakeEmail(object):
     def __init__(self, subject, message_id, body=""):
@@ -27,11 +27,11 @@ class TestSesMailNotification(unittest.TestCase):
         self.data = util.load_fixture('ses_email_notification')['mail']
 
     def test_from_email(self):
-        msg = email.SesMailNotification(self.data)
+        msg = mail.SesMailNotification(self.data)
         assert msg.from_email == "gwb@example.com"
 
     def test_source(self):
-        msg = email.SesMailNotification(self.data)
+        msg = mail.SesMailNotification(self.data)
         assert msg.source == "prvs=31198f0cd=gwb@example.com"
 
 
@@ -47,7 +47,7 @@ class TestSendEmail(unittest.TestCase):
         mock_client.return_value = ses_mock
         expected_destination = {'ToAddresses': ['gwb@example.com']}
 
-        email.send_confirmation("gwb@example.com", self.reservation)
+        mail.send_confirmation("gwb@example.com", self.reservation)
         assert ses_mock.send_email.call_args[1]['Destination'] == expected_destination
 
     @mock.patch('boto3.client')
@@ -69,7 +69,7 @@ class TestSendEmail(unittest.TestCase):
         }
         expected_destination = {'ToAddresses': ['gwb@example.com']}
 
-        email.send_ses_email("gwb@example.com", "fake subject", "fake body", source="wjc@example.com")
+        mail.send_ses_email("gwb@example.com", "fake subject", "fake body", source="wjc@example.com")
 
         assert ses_mock.send_email.call_args[1]['Source'] == "wjc@example.com"
         assert ses_mock.send_email.call_args[1]['Destination'] == expected_destination
@@ -81,20 +81,20 @@ class TestSendEmail(unittest.TestCase):
         mock_client.return_value = ses_mock
         expected_destination = {'ToAddresses': ['gwb@example.com'], 'BccAddresses': ['bcc@example.com']}
 
-        email.send_ses_email("gwb@example.com", "fake subject", "fake body", bcc="bcc@example.com")
+        mail.send_ses_email("gwb@example.com", "fake subject", "fake body", bcc="bcc@example.com")
 
         assert ses_mock.send_email.call_args[1]['Destination'] == expected_destination
 
     def test_find_name_and_confirmation_number(self):
         e = FakeEmail('Fwd: Flight reservation (ABC123) | 25FEB18 | AUS-TUL | Bush/George', 0)
         expected = dict(first_name="George", last_name="Bush", confirmation_number="ABC123")
-        result = email.find_name_and_confirmation_number(e)
+        result = mail.find_name_and_confirmation_number(e)
         assert result == expected
 
     def test_find_name_with_space_and_confirmation_number(self):
         e = FakeEmail('Fwd: Flight reservation (ABC123) | 25FEB18 | AUS-TUL | Mc Lovin/Steven', 0)
         expected = dict(first_name="Steven", last_name="Mc Lovin", confirmation_number="ABC123")
-        result = email.find_name_and_confirmation_number(e)
+        result = mail.find_name_and_confirmation_number(e)
         assert result == expected
 
     def test_find_new_reservation_email(self):
@@ -115,11 +115,11 @@ class TestSendEmail(unittest.TestCase):
         for subject in test_subjects:
             e = FakeEmail(subject, 0, util.load_fixture('new_reservation_email'))
             expected = dict(first_name="George", last_name="Bush", confirmation_number="ABC123")
-            result = email.find_name_and_confirmation_number(e)
+            result = mail.find_name_and_confirmation_number(e)
             assert result == expected, "Failed subject: {}".format(subject)
 
     def test_find_name_and_confirmation_number_shortcut(self):
         e = FakeEmail('ABC123 George Bush', 0)
         expected = dict(first_name="George", last_name="Bush", confirmation_number="ABC123")
-        result = email.find_name_and_confirmation_number(e)
+        result = mail.find_name_and_confirmation_number(e)
         assert result == expected

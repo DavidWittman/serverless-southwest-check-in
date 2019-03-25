@@ -1,7 +1,7 @@
 import json
 import logging
 
-from lib import swa, email  # NOQA
+import swa, mail
 
 # Set up logging
 log = logging.getLogger(__name__)
@@ -66,7 +66,7 @@ def main(event, context):
     # Send a confirmation email
     if email_address:
         try:
-            email.send_confirmation(email_address, reservation=reservation)
+            mail.send_confirmation(email_address, reservation=reservation)
         except Exception as e:
             log.warning("Unable to send confirmation email: {}".format(e))
 

@@ -6,8 +6,8 @@ import responses
 
 import util
 
-from lib import exceptions
-from lib.handlers import receive_email, schedule_check_in, check_in
+import exceptions
+from handlers import receive_email, schedule_check_in, check_in
 
 # Prevent the handler function from logging during test runs
 logging.disable(logging.CRITICAL)
@@ -23,7 +23,7 @@ class TestScheduleCheckIn(unittest.TestCase):
             'email': 'gwb@example.com'
         }
 
-    @mock.patch('lib.email.send_confirmation')
+    @mock.patch('mail.send_confirmation')
     @responses.activate
     def test_schedule_check_in(self, email_mock):
         expected = {
@@ -48,7 +48,7 @@ class TestScheduleCheckIn(unittest.TestCase):
         result = schedule_check_in(self.mock_event, None)
         assert result == expected
 
-    @mock.patch('lib.email.send_confirmation')
+    @mock.patch('mail.send_confirmation')
     @responses.activate
     def test_schedule_multi_passenger_check_in(self, email_mock):
         expected = {

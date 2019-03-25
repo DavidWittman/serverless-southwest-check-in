@@ -5,7 +5,7 @@ import uuid
 
 import boto3
 
-from lib import email # NOQA
+import mail
 
 # Set up logging
 log = logging.getLogger(__name__)
@@ -42,15 +42,15 @@ def main(event, context):
     log.debug("State Machine ARN: {}".format(state_machine_arn))
     log.debug("SES Notification: {}".format(ses_notification))
 
-    ses_msg = email.SesMailNotification(ses_notification['mail'])
+    ses_msg = mail.SesMailNotification(ses_notification['mail'])
 
     try:
-        reservation = email.find_name_and_confirmation_number(ses_msg)
+        reservation = mail.find_name_and_confirmation_number(ses_msg)
         log.info("Found reservation: {}".format(reservation))
     except Exception as e:
         log.error("Error scraping email {}: {}".format(ses_msg.message_id, e))
         if not ses_msg.from_email.endswith('southwest.com'):
-            email.send_failure_notification(ses_msg.from_email)
+            mail.send_failure_notification(ses_msg.from_email)
         return False
 
     # Don't add the email if it's straight from southwest.com

@@ -5,7 +5,7 @@ import re
 import boto3
 import pendulum
 
-from . import exceptions
+import exceptions
 
 # Set up logging
 log = logging.getLogger(__name__)

@@ -5,10 +5,10 @@ import responses
 
 import util
 
-from lib import swa, exceptions
+import swa, exceptions
 
 
-@mock.patch('lib.swa.requests')
+@mock.patch('swa.requests')
 class TestRequest(unittest.TestCase):
     def test_make_request_get(self, mock_requests):
         expected_headers = {
@@ -70,7 +70,7 @@ class TestCheckIn(unittest.TestCase):
         self.confirmation_number = "ABC123"
         self.email = "gwb@example.com"
 
-    @mock.patch('lib.swa._make_request')
+    @mock.patch('swa._make_request')
     def test_check_in_call(self, mock_make_request):
         swa.check_in(self.names, self.confirmation_number)
         mock_make_request.assert_called_with(
@@ -102,7 +102,7 @@ class TestCheckIn(unittest.TestCase):
         with self.assertRaises(exceptions.ReservationNotFoundError):
             result = swa.check_in(self.names, self.confirmation_number)
 
-    @mock.patch('lib.swa._make_request')
+    @mock.patch('swa._make_request')
     def test_email_boarding_pass(self, mock_make_request):
         fake_data = {
             'names': [{
