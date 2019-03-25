@@ -6,7 +6,7 @@ from collections import namedtuple
 
 import util
 
-import mail
+import mail, exceptions
 
 class FakeEmail(object):
     def __init__(self, subject, message_id, body=""):
@@ -123,3 +123,27 @@ class TestSendEmail(unittest.TestCase):
         expected = dict(first_name="George", last_name="Bush", confirmation_number="ABC123")
         result = mail.find_name_and_confirmation_number(e)
         assert result == expected
+
+    def test_not_found(self):
+        e = FakeEmail('Price alert: review your monthly delivery', 0)
+        try:
+            mail.find_name_and_confirmation_number(e)
+            assert False, "ReservationNotFoundError was not raised"
+        except exceptions.ReservationNotFoundError:
+            pass
+
+    def test_not_found_fwd_name(self):
+        # NOTE(dw): This is failing for now because it detects Fwd as the first name
+        test_subjects = [
+            'Fwd: George\'s 12/25 Burbank trip (ABC123): itinerary.',
+            'Fw: George\'s 12/25 Burbank trip (ABC123): itinerary.',
+            'fw: George\'s 12/25 Burbank trip (ABC123): itinerary.',
+            'fwd: George\'s 12/25 Burbank trip (ABC123): itinerary.'
+        ]
+        for subject in test_subjects:
+            e = FakeEmail(subject, 0)
+            try:
+                mail.find_name_and_confirmation_number(e)
+                assert False, "ReservationNotFoundError was not raised"
+            except exceptions.ReservationNotFoundError:
+                pass

@@ -213,6 +213,11 @@ def find_name_and_confirmation_number(msg):
         fname = manual_email_subject_match.group(2)
         lname = manual_email_subject_match.group(3)
 
+    # Short circuit we incorrectly match the first name
+    # TODO(dw): Remove this when we fix this case in the parser
+    if fname in ('Fwd', 'Fw', 'fwd', 'fw'):
+        fname = None
+
     if not all([fname, lname, reservation]):
         raise exceptions.ReservationNotFoundError("Unable to find reservation "
             "in email id {}".format(msg.message_id))
