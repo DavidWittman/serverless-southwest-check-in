@@ -1,7 +1,7 @@
 import logging
 import sys
 
-from .. import swa, exceptions
+import swa, exceptions
 
 # Set up logging
 log = logging.getLogger(__name__)

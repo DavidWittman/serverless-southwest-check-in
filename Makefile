@@ -13,7 +13,7 @@ lint:
 	flake8 --max-line-length=120 lambda/*.py
 
 test:
-	cd lambda; python -m unittest discover tests
+	cd lambda/src; python -m unittest discover ../tests
 
 lambda/vendor: lambda/requirements.txt
 	pip install -r lambda/requirements.txt -t lambda/vendor/python
