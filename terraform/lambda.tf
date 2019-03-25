@@ -4,10 +4,10 @@ data "archive_file" "vendor" {
   output_path = "${path.module}/build/vendor.zip"
 }
 
-data "archive_file" "lib" {
+data "archive_file" "src" {
   type        = "zip"
-  source_dir  = "${path.module}/../lambda/lib/"
-  output_path = "${path.module}/build/lib.zip"
+  source_dir  = "${path.module}/../lambda/src/"
+  output_path = "${path.module}/build/src.zip"
 }
 
 resource "aws_lambda_layer_version" "deps" {
@@ -18,13 +18,13 @@ resource "aws_lambda_layer_version" "deps" {
 }
 
 resource "aws_lambda_function" "sw_receive_email" {
-  filename         = "${data.archive_file.lib.output_path}"
+  filename         = "${data.archive_file.src.output_path}"
   function_name    = "sw-receive-email"
   role             = "${aws_iam_role.lambda.arn}"
   handler          = "handlers.receive_email"
   runtime          = "python3.6"
   timeout          = 10
-  source_code_hash = "${data.archive_file.lib.output_base64sha256}"
+  source_code_hash = "${data.archive_file.src.output_base64sha256}"
   layers           = ["${aws_lambda_layer_version.deps.arn}"]
 
   environment {
@@ -38,13 +38,13 @@ resource "aws_lambda_function" "sw_receive_email" {
 }
 
 resource "aws_lambda_function" "sw_schedule_check_in" {
-  filename         = "${data.archive_file.lib.output_path}"
+  filename         = "${data.archive_file.src.output_path}"
   function_name    = "sw-schedule-check-in"
   role             = "${aws_iam_role.lambda.arn}"
   handler          = "handlers.schedule_check_in"
   runtime          = "python3.6"
   timeout          = 10
-  source_code_hash = "${data.archive_file.lib.output_base64sha256}"
+  source_code_hash = "${data.archive_file.src.output_base64sha256}"
   layers           = ["${aws_lambda_layer_version.deps.arn}"]
 
   environment {
@@ -56,13 +56,13 @@ resource "aws_lambda_function" "sw_schedule_check_in" {
 }
 
 resource "aws_lambda_function" "sw_check_in" {
-  filename         = "${data.archive_file.lib.output_path}"
+  filename         = "${data.archive_file.src.output_path}"
   function_name    = "sw-check-in"
   role             = "${aws_iam_role.lambda.arn}"
   handler          = "handlers.check_in"
   runtime          = "python3.6"
   timeout          = 15
-  source_code_hash = "${data.archive_file.lib.output_base64sha256}"
+  source_code_hash = "${data.archive_file.src.output_base64sha256}"
   layers           = ["${aws_lambda_layer_version.deps.arn}"]
 }
 

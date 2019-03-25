@@ -1,7 +1,7 @@
 import json
 import logging
 
-from lib import swa, email  # NOQA
+from .. import swa, email
 
 # Set up logging
 log = logging.getLogger(__name__)

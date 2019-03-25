@@ -6,7 +6,7 @@ from collections import namedtuple
 
 import util
 
-from lib import email
+from src import email
 
 class FakeEmail(object):
     def __init__(self, subject, message_id, body=""):

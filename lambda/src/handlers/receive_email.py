@@ -5,7 +5,7 @@ import uuid
 
 import boto3
 
-from lib import email # NOQA
+from .. import email
 
 # Set up logging
 log = logging.getLogger(__name__)
