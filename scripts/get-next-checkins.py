@@ -50,7 +50,7 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--state-machine-arn', required=True)
-    parser.add_argument('--count', required=False, default=5)
+    parser.add_argument('--count', type=int, required=False, default=5)
     parser.add_argument('--reverse', action='store_true')
     args = parser.parse_args()
     main(args)
