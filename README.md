@@ -42,6 +42,16 @@ You will be prompted for an S3 location to store the remote statefile in. If you
 
 ## Usage
 
+### Terraform Variables
+
+You need to either specify your variables in a `terraform.tfvars` file, or you will be prompted for the variables during the deploy. 
+
+You can rename the `terraform.tfvars.example` to `terraform.tfvars` and edit it. Alternatively, you can skip to the [Deploy](#deploy) section below in which you will be prompted for the following variables:
+* **var.admin_email**: Administrator email to receive confirmations and alerts. 
+* **var.domains**: List of domains that already have a Route 53 hosted zone configured. The MX record for this domain name will be set to the SES SMTP receiver endpoints for your region, so choose a domain which you do not currently use to receive email. Must be formatted as a list. For example: `["domain.com"]`
+* **var.recipients**: List of email addresses that can receive a forwarded check-in. Must be formatted as a list. For example: `["checkin@domain.com"]`
+* **provider.aws.region**: AWS region in which to deploy
+
 ### Deploy
 
 To package, build, and deploy to AWS, run:
@@ -56,15 +66,13 @@ Or, if you don't have make installed:
 $ pip install -r lambda/requirements.txt -t lambda/vendor/python && terraform apply terraform/
 ```
 
-Terraform will prompt you to provide a domain name of an existing Route53 Hosted Zone. The MX record for this domain name will be set to the SES SMTP receiver endpoints for your region, so choose a domain which you do not currently use to receive email. In the future, support will be added for subdomains and/or disabling the email receiver.
-
 ### Add a flight
 
 New flights can be added by an SES email trigger or by manually executing an AWS Step Function.
 
 #### Add via Email
 
-Forward your reservation email to `checkin@$DOMAIN`, where `$DOMAIN` is the Route53 domain used when deploying the application. The reservation email is sent by Southwest at purchase time and should be in the form:
+Forward your reservation email to the email address set above as `var.recipients`. The reservation email is sent by Southwest at purchase time and should be in the form:
 
 ```
 Flight reservation (ABC123) | 25DEC17 | ABC-XYZ | LASTNAME/FIRSTNAME
