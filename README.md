@@ -44,9 +44,9 @@ You will be prompted for an S3 location to store the remote statefile in. If you
 
 ### Terraform Variables
 
-You need to either specify your variables in a terraform.tfvars file, or you will be prompted for the variables during the deploy. 
+You need to either specify your variables in a `terraform.tfvars` file, or you will be prompted for the variables during the deploy. 
 
-You can rename the terraform.tfvars.example to terraform.tfvars and edit it. Alternatively, you can skip to the deploy section below in which you will be prompted for the following variables:
+You can rename the `terraform.tfvars.example` to `terraform.tfvars` and edit it. Alternatively, you can skip to the [Deploy](#deploy) section below in which you will be prompted for the following variables:
 * **var.admin_email**: Administrator email to receive confirmations and alerts. 
 * **var.domains**: List of domains that already have a Route 53 hosted zone configured. The MX record for this domain name will be set to the SES SMTP receiver endpoints for your region, so choose a domain which you do not currently use to receive email. Must be formatted as a list. For example: `["domain.com"]`
 * **var.recipients**: List of email addresses that can receive a forwarded check-in. Must be formatted as a list. For example: `["checkin@domain.com"]`
