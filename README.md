@@ -63,7 +63,7 @@ $ make deploy
 Or, if you don't have make installed:
 
 ```
-$ pip install -r lambda/requirements.txt -t lambda/vendor && terraform apply terraform/
+$ pip install -r lambda/requirements.txt -t lambda/vendor/python && terraform apply terraform/
 ```
 
 ### Add a flight
