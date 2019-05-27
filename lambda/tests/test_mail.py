@@ -102,6 +102,7 @@ class TestSendEmail(unittest.TestCase):
             'fwd: George Bush\'s 12/25 Boston Logan trip (ABC123): Your reservation is confirmed.',
             'Fwd: George Bush\'s 12/25 Boston Logan trip (ABC123): Your reservation is confirmed.',
             'Fw: George Bush\'s 12/25 Boston Logan trip (ABC123): Your reservation is confirmed.',
+            'FW: George Bush\'s 12/25 Boston Logan trip (ABC123): Your reservation is confirmed.',
             'George Bush\'s 12/25 Boston Logan trip (ABC123): Your change is confirmed.'
             'George Bush\'s 12/25 Detroit trip (ABC123)',
             'George Walker Bush\'s 12/25 Detroit trip (ABC123)',

@@ -159,7 +159,7 @@ def find_name_and_confirmation_number(msg):
 
     # This matches a variety of new email formats which look like
     # George Bush's 12/25 Detroit trip (ABC123)
-    new_email_subject_match = re.search(r"(?:[Ff]wd?: )?(\w+).* (\w+)'s.*\(([A-Z0-9]{6})\)", msg.subject)
+    new_email_subject_match = re.search(r"(?:[Ff][Ww][Dd]?: )?(\w+).* (\w+)'s.*\(([A-Z0-9]{6})\)", msg.subject)
 
     # ABC123 George Bush
     manual_email_subject_match = re.search(r"([A-Z0-9]{6})\s+(\w+) (\w+ ?\w+)", msg.subject)
@@ -215,7 +215,7 @@ def find_name_and_confirmation_number(msg):
 
     # Short circuit we incorrectly match the first name
     # TODO(dw): Remove this when we fix this case in the parser
-    if fname in ('Fwd', 'Fw', 'fwd', 'fw'):
+    if fname and fname.lower() in ('fwd', 'fw'):
         fname = None
 
     if not all([fname, lname, reservation]):
