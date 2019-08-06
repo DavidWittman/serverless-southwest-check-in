@@ -61,7 +61,7 @@ resource "aws_lambda_function" "sw_check_in" {
   role             = "${aws_iam_role.lambda.arn}"
   handler          = "handlers.check_in"
   runtime          = "python3.6"
-  timeout          = 15
+  timeout          = 30
   source_code_hash = "${data.archive_file.src.output_base64sha256}"
   layers           = ["${aws_lambda_layer_version.deps.arn}"]
 }
