@@ -50,6 +50,20 @@ class TestScheduleCheckIn(unittest.TestCase):
 
     @mock.patch('mail.send_confirmation')
     @responses.activate
+    def test_schedule_check_in_without_confirmation_email(self, email_mock):
+        self.mock_event['send_confirmation_email'] = False
+        responses.add(
+            responses.GET,
+            'https://mobile.southwest.com/api/extensions/v1/mobile/reservations/record-locator/ABC123',
+            json=util.load_fixture('get_reservation'),
+            status=200
+        )
+
+        schedule_check_in(self.mock_event, None)
+        email_mock.assert_not_called()
+
+    @mock.patch('mail.send_confirmation')
+    @responses.activate
     def test_schedule_multi_passenger_check_in(self, email_mock):
         expected = {
             'passengers': [
