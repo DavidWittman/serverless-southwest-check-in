@@ -102,24 +102,6 @@ class TestCheckIn(unittest.TestCase):
         with self.assertRaises(exceptions.ReservationNotFoundError):
             result = swa.check_in(self.names, self.confirmation_number)
 
-    @mock.patch('swa._make_request')
-    def test_email_boarding_pass(self, mock_make_request):
-        fake_data = {
-            'names': [{
-                'firstName': 'George',
-                'lastName': 'Bush'
-            }],
-            'emailAddress': 'gwb@example.com'
-        }
-
-        swa.email_boarding_pass(self.names, self.confirmation_number, self.email)
-        mock_make_request.assert_called_with(
-            "/record-locator/ABC123/operation-infos/mobile-boarding-pass/notifications",
-            fake_data,
-            "application/vnd.swacorp.com.mobile.notifications-v1.0+json"
-        )
-
-
 
 class TestReservation(unittest.TestCase):
 

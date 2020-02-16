@@ -1,7 +1,7 @@
 import json
 import logging
 import os
-import uuid
+import time
 
 import boto3
 
@@ -15,12 +15,13 @@ log.setLevel(logging.DEBUG)
 def _get_sfn_execution_name(reservation):
     """
     Generate a human-readable execution named composed of the passenger's
-    first and last name follwed by a UUID
+    check in details followed by a timestamp
     """
-    name = "{}-{}-{}".format(
+    name = "{}-{}-{}-{}".format(
         reservation['last_name'].lower().replace(' ', '-'),
         reservation['first_name'].lower(),
-        uuid.uuid4()
+        reservation['confirmation_number'].lower(),
+        int(time.time())
     )
     return name
 

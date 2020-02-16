@@ -5,21 +5,57 @@
 
 import codecs
 
+from urllib.parse import urlencode
+
 import pendulum
 import requests
 
 import exceptions
 
-BASE_URL = "https://mobile.southwest.com/api/extensions/v1/mobile"
-USER_AGENT = "Southwest/4.9.1 CFNetwork/887 Darwin/17.0.0"
+USER_AGENT = "SouthwestAndroid/7.2.1 android/10"
 # This is not a secret, but obfuscate it to prevent detection
-API_KEY = codecs.decode("y7kk8q364n53035q4o8on84q1ooq537s39p4", "rot13")
+API_KEY = codecs.decode("y7kk8389n5on9ro24nr68onq068oq1860osp", "rot13")
+
+
+def _make_request(method, page, data='', check_status_code=True):
+    url = f"https://mobile.southwest.com/api/{page}"
+    headers = {
+        "User-Agent": USER_AGENT,
+        "X-API-Key": API_KEY,
+        "Accept": "application/json"
+    }
+    method = method.lower()
+
+    if method == 'get':
+        response = requests.get(url, headers=headers, params=urlencode(data))
+    elif method == 'post':
+        headers['Content-Type'] = 'application/json'
+        response = requests.post(url, headers=headers, json=data)
+    else:
+        raise NotImplementedError()
+
+    if check_status_code and not response.ok:
+        try:
+            msg = response.json()["message"]
+        except:
+            msg = response.reason
+
+        if response.status_code == 404:
+            raise exceptions.ReservationNotFoundError()
+
+        raise exceptions.SouthwestAPIError("status_code={} msg=\"{}\"".format(
+            response.status_code, msg))
+
+    return response
 
 
 class Reservation():
-    def __init__(self, data):
-        self.data = data
-        self.confirmation_number = self.data['recordLocator']
+    def __init__(self, first_name, last_name, confirmation_number, response):
+        self.first_name = first_name
+        self.last_name = last_name
+        self.confirmation_number = confirmation_number
+        self.response = response
+
         # Second of the minute to use for check in times
         self.check_in_seconds = 5
 
@@ -28,22 +64,15 @@ class Reservation():
 
     @classmethod
     def from_passenger_info(cls, first_name, last_name, confirmation_number):
-        content_type = 'application/vnd.swacorp.com.mobile.reservations-v1.0+json'
-
-        data = {
-            'action': 'VIEW',
-            'first-name': first_name,
-            'last-name': last_name
-        }
+        params = {'first-name': first_name, 'last-name': last_name}
 
         response = _make_request(
-            '/reservations/record-locator/%s' % confirmation_number,
-            data,
-            content_type,
-            method="get"
+            "get",
+            "mobile-air-booking/v1/mobile-air-booking/page/view-reservation/" + confirmation_number,
+            params
         )
 
-        return cls(response.json())
+        return cls(first_name, last_name, confirmation_number, response.json())
 
     def _get_check_in_time(self, departure_time):
         """
@@ -70,10 +99,10 @@ class Reservation():
         popped from the end of the list.
         """
 
-        flights = self.data['itinerary']['originationDestinations']
+        flights = self.response['viewReservationViewPage']['shareDetails']['flightInfo']
 
         times = [
-            self._get_check_in_time(flight['segments'][0]['departureDateTime'])
+            self._get_check_in_time(flight['departureDateTime'])
             for flight in flights
         ]
 
@@ -87,88 +116,28 @@ class Reservation():
     def check_in_times(self):
         return self.get_check_in_times()
 
-    @property
-    def passengers(self):
-        return [
-            dict(
-                firstName=p['secureFlightName']['firstName'],
-                lastName=p['secureFlightName']['lastName']
-            ) for p in self.data['passengers']
-        ]
 
+def check_in(first_name, last_name, confirmation_number):
+    # first we get a session token with a GET request, then issue a POST to check in
+    page = "mobile-air-operations/v1/mobile-air-operations/page/check-in"
+    params = {'first-name': first_name, 'last-name': last_name}
 
-def _make_request(path, data, content_type, method='post', check_status_code=True):
-    """
-    Issue a request to the Southwest API
+    session = _make_request("get", page + "/" + confirmation_number, params)
+    sessionj = session.json()
 
-    :param path: The path to send the request to. This should begin with a '/' and not include the base url.
-    :param data: Data to send to the server in the HTTP request body.
-    :param content_type: Sets the HTTP Content-Type header
-    :param method: HTTP method to use. ('post' or 'get')
-    :param check_status_code: Raise a SouthwestAPIError if a non-success HTTP status code is returned
-    """
+    try:
+        # the whole POST body (including the session token) is provided here
+        body = sessionj['checkInViewReservationPage']['_links']['checkIn']['body']
+    except KeyError:
+        print(sessionj)
+        raise exceptions.SouthwestAPIError("Error getting check-in session")
 
-    url = "%s%s" % (BASE_URL, path)
-    headers = {
-        "User-Agent": USER_AGENT,
-        "Content-Type": content_type,
-        "X-Api-Key": API_KEY,
-        "Accept-Language": "en-US;q=1"
-    }
+    response = _make_request("post", page, body)
+    if not response.ok:
+        raise exceptions.SouthwestAPIError("Error checking in! response={}".format(response))
 
-    method = method.lower()
-    assert method in ("post", "get")
+    responsej = response.json()
+    if responsej['checkInConfirmationPage']['title']['key'] != 'CHECKIN__YOURE_CHECKEDIN':
+        raise exceptions.SouthwestAPIError("Check in failed. response={}".format(responsej))
 
-    if method == "get":
-        response = requests.get(url, params=data, headers=headers, verify=False)
-    elif method == "post":
-        response = requests.post(url, json=data, headers=headers, verify=False)
-
-    if check_status_code and not response.ok:
-        try:
-            msg = response.json()["message"]
-        except:
-            msg = response.reason
-
-        if response.status_code == 404:
-            raise exceptions.ReservationNotFoundError()
-
-        raise exceptions.SouthwestAPIError("status_code={} msg=\"{}\"".format(
-            response.status_code, msg))
-
-    return response
-
-
-def check_in(names, confirmation_number):
-    content_type = "application/vnd.swacorp.com.mobile.boarding-passes-v1.0+json"
-
-    data = {
-        'names': names
-    }
-
-    response = _make_request(
-        "/reservations/record-locator/%s/boarding-passes" % confirmation_number,
-        data,
-        content_type
-    )
-
-    check_in_docs = response.json()
-
-    return check_in_docs
-
-
-def email_boarding_pass(names, confirmation_number, email):
-    content_type = "application/vnd.swacorp.com.mobile.notifications-v1.0+json"
-
-    data = {
-        'names': names,
-        'emailAddress': email
-    }
-
-    response = _make_request(
-        "/record-locator/%s/operation-infos/mobile-boarding-pass/notifications" % confirmation_number,
-        data,
-        content_type
-    )
-
-    return response.json()
+    return responsej

@@ -13,8 +13,7 @@ SFN = boto3.client('stepfunctions')
 
 def get_execution_history(execution_arn):
     e = SFN.get_execution_history(executionArn=execution_arn)
-    state = json.loads(e['events'][-1]['stateEnteredEventDetails']['input'])
-    return {'next': state['check_in_times']['next'], 'email': state['email']}
+    return json.loads(e['events'][-1]['stateEnteredEventDetails']['input'])
 
 
 async def get_executions(args):
@@ -32,7 +31,7 @@ async def get_executions(args):
 
     done, _ = await asyncio.wait(futures)
     results = [r.result() for r in done]
-    sorted_results = sorted(results, key=lambda x: pendulum.parse(x['next']))
+    sorted_results = sorted(results, key=lambda x: pendulum.parse(x['check_in_times']['next']))
 
     if args.reverse:
         sorted_results = list(reversed(sorted_results))
