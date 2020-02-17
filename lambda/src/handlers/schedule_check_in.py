@@ -59,7 +59,8 @@ def main(event, context):
         'check_in_times': {
             'remaining': reservation.check_in_times,
         },
-        'passengers': reservation.passengers,
+        'first_name': first_name,
+        'last_name': last_name,
         'confirmation_number': confirmation_number,
         'email': email_address
     }
