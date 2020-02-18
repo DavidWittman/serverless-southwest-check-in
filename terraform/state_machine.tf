@@ -28,7 +28,20 @@ resource "aws_sfn_state_machine" "check_in" {
           "IntervalSeconds": 5,
           "MaxAttempts": 3
         }
-      ]
+      ],
+      "Catch": [{
+        "ErrorEquals": ["ReservationNotFoundError"],
+        "Next": "Fail"
+       }, {
+        "ErrorEquals": ["States.ALL"],
+        "Next": "CheckInFailure"
+      }]
+    },
+    "CheckInFailure": {
+      "Type": "Task",
+      "Resource": "${aws_lambda_function.sw_check_in_failure.arn}",
+      "ResultPath": "$.is_last_check_in",
+      "Next": "IsLastCheckIn"
     },
     "IsLastCheckIn": {
       "Type": "Choice",
@@ -40,6 +53,9 @@ resource "aws_sfn_state_machine" "check_in" {
         }
       ],
       "Default": "Done"
+    },
+    "Fail": {
+      "Type": "Fail"
     },
     "Done": {
       "Type": "Pass",
