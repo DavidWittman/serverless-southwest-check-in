@@ -1,11 +1,20 @@
 import logging
 import sys
 
-import swa, exceptions
+import swa, exceptions, mail
 
 # Set up logging
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
+
+
+def _generate_email_body(response):
+    body = "I just checked in to your flight! Please login to Southwest to view your boarding passes.\n"
+    for flight in response['checkInConfirmationPage']['flights']:
+        body += f"\n{flight['originAirportCode']} => {flight['destinationAirportCode']} (#{flight['flightNumber']})\n"
+        for passenger in flight['passengers']:
+            body += f"  - {passenger['name']}: {passenger['boardingGroup']}{passenger['boardingPosition']}\n"
+    return body
 
 
 def main(event, context):
@@ -33,6 +42,21 @@ def main(event, context):
     except Exception as e:
         log.error("Error checking in: {}".format(e))
         raise
+
+    # Send success email
+    # TODO(dw): This should probably be a separate task in the step function
+    subject = "You're checked in!"
+    body = "I just checked into your flight! Please login to Southwest to view your boarding passes."
+
+    try:
+        body = _generate_email_body(resp)
+    except Exception as e:
+        log.warning("Error parsing flight details from check-in response: {}".format(e))
+
+    try:
+        mail.send_ses_email(email, subject, body)
+    except Exception as e:
+        log.warning("Error sending email: {}".format(e))
 
     # Return False to indicate that there are check-ins remaining
     if len(event['check_in_times']['remaining']) > 0:

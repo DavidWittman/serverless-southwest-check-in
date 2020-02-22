@@ -64,6 +64,31 @@ resource "aws_lambda_function" "sw_check_in" {
   timeout          = 30
   source_code_hash = "${data.archive_file.src.output_base64sha256}"
   layers           = ["${aws_lambda_layer_version.deps.arn}"]
+
+  environment {
+    variables = {
+      EMAIL_SOURCE = "\"Checkin Bot\" <no-reply@${var.domains[0]}>"
+      EMAIL_BCC    = "${var.admin_email}"
+    }
+  }
+}
+
+resource "aws_lambda_function" "sw_check_in_failure" {
+  filename         = "${data.archive_file.src.output_path}"
+  function_name    = "sw-check-in-failure"
+  role             = "${aws_iam_role.lambda.arn}"
+  handler          = "handlers.check_in_failure"
+  runtime          = "python3.6"
+  timeout          = 10
+  source_code_hash = "${data.archive_file.src.output_base64sha256}"
+  layers           = ["${aws_lambda_layer_version.deps.arn}"]
+
+  environment {
+    variables = {
+      EMAIL_SOURCE = "\"Checkin Bot\" <no-reply@${var.domains[0]}>"
+      EMAIL_BCC    = "${var.admin_email}"
+    }
+  }
 }
 
 resource "aws_lambda_permission" "allow_ses" {
