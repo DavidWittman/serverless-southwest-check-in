@@ -3,3 +3,4 @@
 resource "aws_sns_topic" "admin_notifications" {
   name = "checkin-notifications"
 }
+

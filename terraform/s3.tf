@@ -37,4 +37,6 @@ resource "aws_s3_bucket" "email" {
     ]
 }
 POLICY
+
 }
+

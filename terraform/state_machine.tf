@@ -1,6 +1,6 @@
 resource "aws_sfn_state_machine" "check_in" {
   name     = "check-in"
-  role_arn = "${aws_iam_role.state_machine.arn}"
+  role_arn = aws_iam_role.state_machine.arn
 
   definition = <<EOF
 {
@@ -64,4 +64,6 @@ resource "aws_sfn_state_machine" "check_in" {
   }
 }
 EOF
+
 }
+

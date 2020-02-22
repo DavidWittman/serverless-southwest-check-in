@@ -15,11 +15,12 @@ resource "aws_iam_role" "lambda" {
   ]
 }
 POLICY
+
 }
 
 resource "aws_iam_role_policy" "lambda" {
   name = "sw-lambda"
-  role = "${aws_iam_role.lambda.id}"
+  role = aws_iam_role.lambda.id
 
   policy = <<POLICY
 {
@@ -68,6 +69,7 @@ resource "aws_iam_role_policy" "lambda" {
   ]
 }
 POLICY
+
 }
 
 resource "aws_iam_role" "state_machine" {
@@ -87,11 +89,12 @@ resource "aws_iam_role" "state_machine" {
   ]
 }
 POLICY
+
 }
 
 resource "aws_iam_role_policy" "state_machine" {
   name = "sw-state-machine"
-  role = "${aws_iam_role.state_machine.id}"
+  role = aws_iam_role.state_machine.id
 
   policy = <<POLICY
 {
@@ -107,4 +110,6 @@ resource "aws_iam_role_policy" "state_machine" {
   ]
 }
 POLICY
+
 }
+
