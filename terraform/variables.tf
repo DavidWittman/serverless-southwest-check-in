@@ -11,3 +11,8 @@ variable "recipients" {
 variable "admin_email" {
   description = "This email address will be used for alerts and BCCs on confirmations"
 }
+
+variable "feedback_email" {
+  description = "An email address under one of the `domains` which receives user feedback. e.g. `feedback@example.com`."
+  default     = ""
+}

@@ -33,6 +33,7 @@ resource "aws_lambda_function" "sw_receive_email" {
       STATE_MACHINE_ARN = "${aws_sfn_state_machine.check_in.id}"
       EMAIL_SOURCE      = "\"Checkin Bot\" <no-reply@${var.domains[0]}>"
       EMAIL_BCC         = "${var.admin_email}"
+      EMAIL_FEEDBACK    = "${var.feedback_email}"
     }
   }
 }
@@ -49,8 +50,9 @@ resource "aws_lambda_function" "sw_schedule_check_in" {
 
   environment {
     variables = {
-      EMAIL_SOURCE = "\"Checkin Bot\" <no-reply@${var.domains[0]}>"
-      EMAIL_BCC    = "${var.admin_email}"
+      EMAIL_SOURCE   = "\"Checkin Bot\" <no-reply@${var.domains[0]}>"
+      EMAIL_BCC      = "${var.admin_email}"
+      EMAIL_FEEDBACK = "${var.feedback_email}"
     }
   }
 }
@@ -67,8 +69,9 @@ resource "aws_lambda_function" "sw_check_in" {
 
   environment {
     variables = {
-      EMAIL_SOURCE = "\"Checkin Bot\" <no-reply@${var.domains[0]}>"
-      EMAIL_BCC    = "${var.admin_email}"
+      EMAIL_SOURCE   = "\"Checkin Bot\" <no-reply@${var.domains[0]}>"
+      EMAIL_BCC      = "${var.admin_email}"
+      EMAIL_FEEDBACK = "${var.feedback_email}"
     }
   }
 }
@@ -85,8 +88,9 @@ resource "aws_lambda_function" "sw_check_in_failure" {
 
   environment {
     variables = {
-      EMAIL_SOURCE = "\"Checkin Bot\" <no-reply@${var.domains[0]}>"
-      EMAIL_BCC    = "${var.admin_email}"
+      EMAIL_SOURCE   = "\"Checkin Bot\" <no-reply@${var.domains[0]}>"
+      EMAIL_BCC      = "${var.admin_email}"
+      EMAIL_FEEDBACK = "${var.feedback_email}"
     }
   }
 }
