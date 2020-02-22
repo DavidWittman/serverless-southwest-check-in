@@ -70,6 +70,7 @@ def send_ses_email(to, subject, body, **kwargs):
 
     source = kwargs.get('source', os.environ.get('EMAIL_SOURCE'))
     bcc = kwargs.get('bcc', os.environ.get('EMAIL_BCC'))
+    reply_to = kwargs.get('reply_to', os.environ.get('EMAIL_FEEDBACK'))
 
     msg = {
         'Subject': {
@@ -90,6 +91,14 @@ def send_ses_email(to, subject, body, **kwargs):
 
     ses = boto3.client('ses')
     log.info("Sending email to {}".format(to))
+
+    if reply_to:
+        return ses.send_email(
+            Source=source,
+            Destination=destination,
+            Message=msg,
+            ReplyToAddresses=[reply_to]
+        )
 
     return ses.send_email(
         Source=source,
@@ -119,6 +128,10 @@ def send_confirmation(to, reservation):
         pt = pendulum.parse(c)
         body += " - {}\n".format(pt.to_day_datetime_string())
 
+    feedback_email = os.environ.get('EMAIL_FEEDBACK')
+    if feedback_email:
+        body += f"\nQuestions? Comments? Reply to this message or email {feedback_email}."
+
     return send_ses_email(to, subject, body)
 
 
@@ -143,6 +156,11 @@ def send_failure_notification(to):
         "When your flight is successfully scheduled, I will send you a friendly email confirming "
         "your checkin times."
     )
+
+    feedback_email = os.environ.get('EMAIL_FEEDBACK')
+    if feedback_email:
+        body += f"\n\nStill having problems? Reply to this message or email {feedback_email} for help."
+
     return send_ses_email(to, subject, body)
 
 

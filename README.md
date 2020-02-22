@@ -50,6 +50,7 @@ You can rename the `terraform.tfvars.example` to `terraform.tfvars` and edit it.
 * **var.admin_email**: Administrator email to receive confirmations and alerts. 
 * **var.domains**: List of domains that already have a Route 53 hosted zone configured. The MX record for this domain name will be set to the SES SMTP receiver endpoints for your region, so choose a domain which you do not currently use to receive email. Must be formatted as a list. For example: `["domain.com"]`
 * **var.recipients**: List of email addresses that can receive a forwarded check-in. Must be formatted as a list. For example: `["checkin@domain.com"]`
+* **var.feedback_email**: An email address under one of the `domains` which receives user feedback. e.g. `feedback@example.com`. All mail sent to this address is directed to an SNS topic and not processed any further.
 * **provider.aws.region**: AWS region in which to deploy
 
 ### Deploy
