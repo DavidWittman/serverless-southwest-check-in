@@ -14,7 +14,7 @@ Skip to the [Deploy](#deploy) section if you already have Terraform installed an
 
 ### Requirements
 
- - [Terraform](https://www.terraform.io/intro/getting-started/install.html). Install this first.
+ - [Terraform 0.12+](https://learn.hashicorp.com/terraform/getting-started/install.html). Install this first.
  - AWS IAM user credentials with Administrator access (for Terraform)
  - A Route53 hosted zone for receiving emails via SES
 
