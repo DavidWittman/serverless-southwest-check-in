@@ -38,7 +38,7 @@ def main(event, context):
         log.debug("Check-in response: {}".format(resp))
     except exceptions.ReservationNotFoundError:
         log.error("Reservation {} not found. It may have been cancelled".format(confirmation_number))
-        return False
+        raise
     except Exception as e:
         log.error("Error checking in: {}".format(e))
         raise
