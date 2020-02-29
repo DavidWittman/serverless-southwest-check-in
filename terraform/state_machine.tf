@@ -5,9 +5,9 @@ resource "aws_sfn_state_machine" "check_in" {
   definition = <<EOF
 {
   "Comment": "Checks in a Southwest reservation",
-  "StartAt": "ScheduleCheckIn",
+  "StartAt": "ScheduleCheckIns",
   "States": {
-    "ScheduleCheckIn": {
+    "ScheduleCheckIns": {
       "Type": "Task",
       "Resource": "${aws_lambda_function.sw_schedule_check_in.arn}",
       "Next": "MapCheckIns"
@@ -32,7 +32,6 @@ resource "aws_sfn_state_machine" "check_in" {
             "Type": "Task",
             "Resource": "${aws_lambda_function.sw_check_in.arn}",
             "InputPath": "$.data",
-            "Next": "RecordCheckIn",
             "Retry": [
               {
                 "ErrorEquals": ["SouthwestAPIError"],
@@ -45,17 +44,13 @@ resource "aws_sfn_state_machine" "check_in" {
               "Next": "Fail"
              }, {
               "ErrorEquals": ["States.ALL"],
-              "Next": "CheckInFailure"
-            }]
-          },
-          "CheckInFailure": {
-            "Type": "Task",
-            "Resource": "${aws_lambda_function.sw_check_in_failure.arn}",
+              "Next": "SendFailureNotification"
+            }],
             "End": true
           },
-          "RecordCheckIn": {
+          "SendFailureNotification": {
             "Type": "Task",
-            "Resource": "${aws_lambda_function.sw_record_check_in.arn}",
+            "Resource": "${aws_lambda_function.sw_check_in_failure.arn}",
             "End": true
           },
           "Fail": {
