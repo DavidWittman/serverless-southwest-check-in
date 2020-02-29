@@ -10,55 +10,59 @@ resource "aws_sfn_state_machine" "check_in" {
     "ScheduleCheckIn": {
       "Type": "Task",
       "Resource": "${aws_lambda_function.sw_schedule_check_in.arn}",
-      "Next": "WaitUntilCheckIn"
+      "Next": "MapCheckIns"
     },
-    "WaitUntilCheckIn": {
-      "Type": "Wait",
-      "TimestampPath": "$.check_in_times.next",
-      "Next": "CheckIn"
-    },
-    "CheckIn": {
-      "Type": "Task",
-      "Resource": "${aws_lambda_function.sw_check_in.arn}",
-      "ResultPath": "$.is_last_check_in",
-      "Next": "IsLastCheckIn",
-      "Retry": [
-        {
-          "ErrorEquals": ["SouthwestAPIError"],
-          "IntervalSeconds": 5,
-          "MaxAttempts": 3
+    "MapCheckIns": {
+      "Type": "Map",
+      "ItemsPath": "$.check_in_times",
+      "MaxConcurrency": 0,
+      "Parameters": {
+        "time.$": "$$.Map.Item.Value",
+        "data.$": "$"
+      },
+      "Iterator": {
+        "StartAt": "WaitUntilCheckIn",
+        "States": {
+          "WaitUntilCheckIn": {
+            "Type": "Wait",
+            "TimestampPath": "$.time",
+            "Next": "CheckIn"
+          },
+          "CheckIn": {
+            "Type": "Task",
+            "Resource": "${aws_lambda_function.sw_check_in.arn}",
+            "InputPath": "$.data",
+            "Next": "RecordCheckIn",
+            "Retry": [
+              {
+                "ErrorEquals": ["SouthwestAPIError"],
+                "IntervalSeconds": 3,
+                "MaxAttempts": 3
+              }
+            ],
+            "Catch": [{
+              "ErrorEquals": ["ReservationNotFoundError"],
+              "Next": "Fail"
+             }, {
+              "ErrorEquals": ["States.ALL"],
+              "Next": "CheckInFailure"
+            }]
+          },
+          "CheckInFailure": {
+            "Type": "Task",
+            "Resource": "${aws_lambda_function.sw_check_in_failure.arn}",
+            "End": true
+          },
+          "RecordCheckIn": {
+            "Type": "Task",
+            "Resource": "${aws_lambda_function.sw_record_check_in.arn}",
+            "End": true
+          },
+          "Fail": {
+            "Type": "Fail"
+          }
         }
-      ],
-      "Catch": [{
-        "ErrorEquals": ["ReservationNotFoundError"],
-        "Next": "Fail"
-       }, {
-        "ErrorEquals": ["States.ALL"],
-        "Next": "CheckInFailure"
-      }]
-    },
-    "CheckInFailure": {
-      "Type": "Task",
-      "Resource": "${aws_lambda_function.sw_check_in_failure.arn}",
-      "ResultPath": "$.is_last_check_in",
-      "Next": "IsLastCheckIn"
-    },
-    "IsLastCheckIn": {
-      "Type": "Choice",
-      "Choices": [
-        {
-          "Variable": "$.is_last_check_in",
-          "BooleanEquals": false,
-          "Next": "ScheduleCheckIn"
-        }
-      ],
-      "Default": "Done"
-    },
-    "Fail": {
-      "Type": "Fail"
-    },
-    "Done": {
-      "Type": "Pass",
+      },
       "End": true
     }
   }

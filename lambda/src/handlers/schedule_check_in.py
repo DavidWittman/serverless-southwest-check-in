@@ -10,31 +10,12 @@ log.setLevel(logging.DEBUG)
 
 def main(event, context):
     """
-    This function serves two purposes:
+    This handler looks up the Southwest Reservation via the API to retrieve flight times.
 
-        1) For new executions, it looks up the reservation via the Southwest
-           API and returns the check-in times (described below).
-
-        2) In the event there are multiple check-ins, this function is called
-           again by the AWS Step state machine to schedule the next available
-           check-in time. It does this by popping a value from
-           `check_in_times.remaining` into `check_in_times.next`.
-
-    Returns a dictionary of the next and remaining check-in times in RFC 3339
-    format. Ex:
-
-        {
-            "check_in_times": {
-                "next": "2017-05-06T20:40:00-04:00",
-                "remaining": [
-                    "2017-05-12T20:40:00-04:00",
-                    "2017-05-09T20:40:00-04:00"
-                ]
-            }
-        }
-
+    Returns a dictionary containing details for the rest of the check-in
     """
 
+    # Handle older check-in events TODO(dw): Deprecate this
     # We already have the check-in times, just schedule the next one.
     if 'check_in_times' in event:
         event['check_in_times']['next'] = \
@@ -56,9 +37,7 @@ def main(event, context):
     log.debug("Reservation: {}".format(reservation))
 
     result = {
-        'check_in_times': {
-            'remaining': reservation.check_in_times,
-        },
+        'check_in_times': reservation.check_in_times,
         'first_name': first_name,
         'last_name': last_name,
         'confirmation_number': confirmation_number,
@@ -72,5 +51,4 @@ def main(event, context):
         except Exception as e:
             log.warning("Unable to send confirmation email: {}".format(e))
 
-    # Call ourself now that we have some check-in times.
-    return main(result, None)
+    return result

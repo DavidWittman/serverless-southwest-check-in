@@ -95,6 +95,17 @@ resource "aws_lambda_function" "sw_check_in_failure" {
   }
 }
 
+resource "aws_lambda_function" "sw_record_check_in" {
+  filename         = data.archive_file.src.output_path
+  function_name    = "sw-record-check-in"
+  role             = aws_iam_role.lambda.arn
+  handler          = "handlers.record_check_in"
+  runtime          = "python3.6"
+  timeout          = 10
+  source_code_hash = data.archive_file.src.output_base64sha256
+  layers           = [aws_lambda_layer_version.deps.arn]
+}
+
 resource "aws_lambda_permission" "allow_ses" {
   statement_id   = "AllowExecutionFromSES"
   action         = "lambda:InvokeFunction"
