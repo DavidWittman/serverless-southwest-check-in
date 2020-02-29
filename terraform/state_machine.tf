@@ -44,13 +44,15 @@ resource "aws_sfn_state_machine" "check_in" {
               "Next": "Fail"
              }, {
               "ErrorEquals": ["States.ALL"],
-              "Next": "SendFailureNotification"
+              "Next": "SendFailureNotification",
+              "ResultPath": "$.error"
             }],
             "End": true
           },
           "SendFailureNotification": {
             "Type": "Task",
             "Resource": "${aws_lambda_function.sw_check_in_failure.arn}",
+            "InputPath": "$.data",
             "End": true
           },
           "Fail": {
