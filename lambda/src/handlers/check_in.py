@@ -58,8 +58,9 @@ def main(event, context):
     except Exception as e:
         log.warning("Error sending email: {}".format(e))
 
-    # Return False to indicate that there are check-ins remaining
-    if len(event['check_in_times']['remaining']) > 0:
+    # Older events use check_in_times.remaining to track remaining check-ins
+    # TODO(dw): Remove this when old events are deprecated
+    if 'remaining' in event['check_in_times'] and len(event['check_in_times']['remaining']) > 0:
         return False
 
     return True
