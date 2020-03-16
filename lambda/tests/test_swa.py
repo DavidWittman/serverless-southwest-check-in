@@ -1,160 +1,106 @@
+import os
 import unittest
 
 import mock
-import responses
+import vcr
 
 import util
 
 import swa, exceptions
 
+v = vcr.VCR(
+    cassette_library_dir=os.path.join(os.path.dirname(__file__), 'fixtures'),
+    decode_compressed_response=True
+)
 
 @mock.patch('swa.requests')
 class TestRequest(unittest.TestCase):
     def test_make_request_get(self, mock_requests):
         expected_headers = {
-            "User-Agent": "Southwest/4.9.1 CFNetwork/887 Darwin/17.0.0",
-            "Content-Type": "application/vnd.swacorp.com.mobile.boarding-passes-v1.0+json",
-            "X-Api-Key": swa.API_KEY,
-            "Accept-Language": "en-US;q=1"
+            "User-Agent": "SouthwestAndroid/7.2.1 android/10",
+            "Accept": "application/json",
+            "X-API-Key": swa.API_KEY
         }
-        expected_url = "https://mobile.southwest.com/api/extensions/v1/mobile/foo/123456/bar"
-        fake_data = {}
+        expected_url = "https://mobile.southwest.com/api/foo/123456/bar"
+        fake_data = ''
 
         _ = swa._make_request(  # NOQA
-            "/foo/123456/bar",
-            fake_data,
-            method='get',
-            content_type="application/vnd.swacorp.com.mobile.boarding-passes-v1.0+json"
+            "get",
+            "foo/123456/bar",
+            fake_data
         )
 
-        mock_requests.get.assert_called_with(expected_url, params=fake_data, headers=expected_headers, verify=False)
+        mock_requests.get.assert_called_with(expected_url, params=fake_data, headers=expected_headers)
 
     def test_make_request_post(self, mock_requests):
         expected_headers = {
-            "User-Agent": "Southwest/4.9.1 CFNetwork/887 Darwin/17.0.0",
-            "Content-Type": "application/vnd.swacorp.com.mobile.boarding-passes-v1.0+json",
-            "X-Api-Key": swa.API_KEY,
-            "Accept-Language": "en-US;q=1"
+            "User-Agent": "SouthwestAndroid/7.2.1 android/10",
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "X-API-Key": swa.API_KEY
         }
-        expected_url = "https://mobile.southwest.com/api/extensions/v1/mobile/foo/123456/bar"
-        fake_data = {}
+        expected_url = "https://mobile.southwest.com/api/foo/123456/bar"
+        fake_data = ''
 
         _ = swa._make_request(  # NOQA
-            "/foo/123456/bar",
-            fake_data,
-            content_type="application/vnd.swacorp.com.mobile.boarding-passes-v1.0+json"
+            "post",
+            "foo/123456/bar",
+            fake_data
         )
 
-        mock_requests.post.assert_called_with(expected_url, json=fake_data, headers=expected_headers, verify=False)
+        mock_requests.post.assert_called_with(expected_url, json=fake_data, headers=expected_headers)
 
     def test_make_request_invalid_method(self, mock_requests):
-        with self.assertRaises(AssertionError):
-            swa._make_request("/foo/123456/bar", {}, "application/json", method="foo")
+        with self.assertRaises(NotImplementedError):
+            swa._make_request("foo", "/foo/123456/bar", {}, "application/json")
 
 
 class TestCheckIn(unittest.TestCase):
 
-    def setUp(self):
-        self.names = [{
-            'firstName': 'George',
-            'lastName': 'Bush'
-        }]
-        self.data = {
-            'names': [{
-                'firstName': 'George',
-                'lastName': 'Bush'
-            }]
-        }
-        self.first_name = "George"
-        self.last_name = "Bush"
-        self.confirmation_number = "ABC123"
-        self.email = "gwb@example.com"
-
-    @mock.patch('swa._make_request')
-    def test_check_in_call(self, mock_make_request):
-        swa.check_in(self.names, self.confirmation_number)
-        mock_make_request.assert_called_with(
-            "/reservations/record-locator/ABC123/boarding-passes",
-            self.data,
-            "application/vnd.swacorp.com.mobile.boarding-passes-v1.0+json"
-        )
-
-    @responses.activate
+    @v.use_cassette('check_in_success.yml', filter_headers=['X-API-Key'])
     def test_check_in_success(self):
-        responses.add(
-            responses.POST,
-            'https://mobile.southwest.com/api/extensions/v1/mobile/reservations/record-locator/ABC123/boarding-passes',
-            json=util.load_fixture('check_in_success'),
-            status=200
-        )
-        result = swa.check_in(self.names, self.confirmation_number)
-        assert result['passengerCheckInDocuments'][0]['passenger']['firstName'] == "GEORGE"
-        assert result['passengerCheckInDocuments'][0]['passenger']['lastName'] == "BUSH"
+        result = swa.check_in("George", "Bush", "ABC123")
+        assert result['checkInConfirmationPage']['flights'][0]['passengers'][0]['name'] == "George W Bush"
+        assert result['checkInConfirmationPage']['flights'][0]['passengers'][0]['boardingGroup'] == "A"
+        assert result['checkInConfirmationPage']['flights'][0]['passengers'][0]['boardingPosition'] == "33"
 
-    @responses.activate
+    @v.use_cassette('check_in_not_found.yml', filter_headers=['X-API-Key'])
     def test_check_in_reservation_cancelled(self):
-        responses.add(
-            responses.POST,
-            'https://mobile.southwest.com/api/extensions/v1/mobile/reservations/record-locator/ABC123/boarding-passes',
-            json=util.load_fixture('check_in_reservation_cancelled'),
-            status=404
-        )
         with self.assertRaises(exceptions.ReservationNotFoundError):
-            result = swa.check_in(self.names, self.confirmation_number)
+            result = swa.check_in("George", "Bush", "ABC123")
 
 
 class TestReservation(unittest.TestCase):
 
-    @responses.activate
+    @v.use_cassette('view_reservation.yml', filter_headers=['X-API-Key'])
     def test_from_passenger_info(self):
-        responses.add(
-            responses.GET,
-            'https://mobile.southwest.com/api/extensions/v1/mobile/reservations/record-locator/ABC123',
-            json=util.load_fixture('get_reservation'),
-            status=200
-        )
         r = swa.Reservation.from_passenger_info("George", "Bush", "ABC123")
         assert isinstance(r, swa.Reservation)
 
-    def test_passengers(self):
-        fixture = util.load_fixture('get_reservation')
-        expected = [{"firstName": "GEORGE", "lastName": "BUSH"}]
-        r = swa.Reservation(fixture)
-        assert r.passengers == expected
-
-    def test_multiple_passengers(self):
-        fixture = util.load_fixture('get_multi_passenger_reservation')
-        expected = [
-            {"firstName": "GEORGE", "lastName": "BUSH"},
-            {"firstName": "LAURA", "lastName": "BUSH"}
-        ]
-        r = swa.Reservation(fixture)
-        assert r.passengers == expected
-
+    @v.use_cassette('view_reservation.yml', filter_headers=['X-API-Key'])
     def test_check_in_times(self):
-        fixture = util.load_fixture('get_reservation')
-        r = swa.Reservation(fixture)
+        r = swa.Reservation.from_passenger_info("George", "Bush", "ABC123")
         assert r.check_in_times == ['2099-08-21T07:35:05-05:00', '2099-08-17T18:50:05-05:00']
 
+    @v.use_cassette('view_reservation_active.yml', filter_headers=['X-API-Key'])
     def test_check_in_times_no_expired(self):
-        # The get_active_reservation fixture contains one flight leg which has already occurred
-        fixture = util.load_fixture('get_active_reservation')
-        r = swa.Reservation(fixture)
+        # this fixture contains one flight which has already occurred
+        r = swa.Reservation.from_passenger_info("George", "Bush", "ABC123")
         assert r.check_in_times == ['2099-08-21T07:35:05-05:00']
 
+    @v.use_cassette('view_reservation_active.yml', filter_headers=['X-API-Key'])
     def test_get_check_in_times_with_expired(self):
-        # The get_active_reservation fixture contains one flight leg which has already occurred
-        fixture = util.load_fixture('get_active_reservation')
-        r = swa.Reservation(fixture)
+        # this fixture contains one flight which has already occurred
+        r = swa.Reservation.from_passenger_info("George", "Bush", "ABC123")
         assert r.get_check_in_times(expired=True) == ['2099-08-21T07:35:05-05:00', '1999-08-17T18:50:05-05:00']
 
+    @v.use_cassette('view_reservation.yml', filter_headers=['X-API-Key'])
     def test_check_in_times_alternate_second(self):
-        fixture = util.load_fixture('get_reservation')
-        r = swa.Reservation(fixture)
+        r = swa.Reservation.from_passenger_info("George", "Bush", "ABC123")
         r.check_in_seconds = 42
         assert r.check_in_times == ['2099-08-21T07:35:42-05:00', '2099-08-17T18:50:42-05:00']
 
+    @v.use_cassette('view_reservation.yml', filter_headers=['X-API-Key'])
     def test_confirmation_number(self):
-        fixture = util.load_fixture('get_reservation')
-        r = swa.Reservation(fixture)
+        r = swa.Reservation.from_passenger_info("George", "Bush", "ABC123")
         assert r.confirmation_number == "ABC123"

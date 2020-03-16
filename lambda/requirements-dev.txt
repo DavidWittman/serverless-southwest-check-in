@@ -1,5 +1,5 @@
 -r requirements.txt
-boto3==1.4.8
+boto3==1.12.21
 mock==2.0.0
-responses==0.8.1
 flake8==3.5.0
+vcrpy==4.0.2

@@ -1,0 +1,37 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - SouthwestAndroid/7.2.1 android/10
+    method: GET
+    uri: https://mobile.southwest.com/api/mobile-air-operations/v1/mobile-air-operations/page/check-in/ABC123?first-name=George&last-name=Bush
+  response:
+    body:
+      string: ''
+    headers:
+      Cache-Control:
+      - max-age=0, no-cache, no-store
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Pragma:
+      - no-cache
+      Server:
+      - SWA
+      Strict-Transport-Security:
+      - max-age=60
+      Vary:
+      - Accept-Encoding
+      X-User-Experience-ID:
+      - no-exp-id
+    status:
+      code: 403
+      message: Forbidden
