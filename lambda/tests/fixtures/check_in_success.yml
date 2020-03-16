@@ -1,0 +1,130 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - SouthwestAndroid/7.2.1 android/10
+    method: GET
+    uri: https://mobile.southwest.com/api/mobile-air-operations/v1/mobile-air-operations/page/check-in/ABC123?first-name=George&last-name=Bush
+  response:
+    body:
+      string: '{"checkInSessionToken":"REDACTED","checkInViewReservationPage":{"pnr":{"confirmationNumber":"ABC123","passengers":["George
+        Bush"]},"cards":[{"dates":{"first":"2020-03-16","second":null},"destinationDescription":"Houston","departureDate":"2020-03-16","departureAirport":"MDW","departureTime":"13:05","arrivalAirport":"HOU","arrivalTime":"15:45","hazmatCheckInDisclaimer":"By
+        tapping ''Check in'' you acknowledge that you understand the hazardous materials
+        restrictions and penalties.","flights":[{"flightNumber":"690","hasWifi":true,"originAirportCode":"MDW","destinationAirportCode":"HOU","destinationStationName":"Houston
+        (Hobby)","departureDate":"Mar 16","departureGate":"B15","departureTime":"13:05"}],"travelTime":"2h
+        40m"}],"hazmatText":"Federal law forbids the carriage of hazardous materials
+        such as aerosols, fireworks, lithium batteries and flammable liquids aboard
+        the aircraft in your checked or carryon baggage. E-cigarettes are not permitted
+        in checked baggage and must be transported in carryon baggage only.","_links":{"checkIn":{"href":"/v1/mobile-air-operations/page/check-in","method":"POST","body":{"recordLocator":"ABC123","checkInSessionToken":"REDACTED","firstName":"George","lastName":"Bush","passengerSearchToken":"REDACTED"}},"travelDocuments":null}},"prefillPassengerAPISDocuments":null}'
+    headers:
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Headers:
+      - origin, content-type, accept, authorization, token, User-Agent, X-Forwarded-For,
+        X-User-Experience-ID, X-Request-ID, X-API-Key, X-Account-Number, X-Swa-Region,
+        X-Channel-Id, X-Api-IDToken, true-host
+      Access-Control-Allow-Methods:
+      - GET, POST, PUT, DELETE, OPTIONS, HEAD
+      Access-Control-Allow-Origin:
+      - ''
+      Access-Control-Expose-Headers:
+      - X-User-Experience-ID, X-Request-ID
+      Access-Control-Max-Age:
+      - '1'
+      Cache-Control:
+      - max-age=0, no-cache, no-store
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Pragma:
+      - no-cache
+      Server:
+      - SWA
+      Server-Timing:
+      - cdn-cache; desc=MISS
+      - edge; dur=22
+      - origin; dur=696
+      Strict-Transport-Security:
+      - max-age=60
+      Vary:
+      - Accept-Encoding
+      X-User-Experience-ID:
+      - no-exp-id
+      content-length:
+      - '20141'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"recordLocator": "ABC123", "checkInSessionToken": "REDACTED",
+      "firstName": "George", "lastName": "Bush", "passengerSearchToken": "REDACTED"}'
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '9624'
+      Content-Type:
+      - application/json
+      User-Agent:
+      - SouthwestAndroid/7.2.1 android/10
+    method: POST
+    uri: https://mobile.southwest.com/api/mobile-air-operations/v1/mobile-air-operations/page/check-in
+  response:
+    body:
+      string: '{"checkInConfirmationPage":{"messages":null,"contactInformationMessage":null,"title":{"key":"CHECKIN__YOURE_CHECKEDIN","body":"You''re
+        checked in!","icon":"SUCCESS","textColor":"NORMAL"},"flights":[{"boundIndex":0,"segmentType":"DEPARTING","departureTime":"13:05","gate":"B15","passengers":[{"name":"George
+        W Bush","hasPrecheck":true,"boardingGroup":"A","boardingPosition":"33","mobileBoardingPassEligible":true,"mobileBoardingPassIneligibilityErrorCode":"","greyBoxMessage":null,"specialAssistanceMessage":null,"travelerSegmentIdentifier":"2002AD5900223185","travelerID":"REDACTED","checkedIn":true,"confirmationNumber":"ABC123","_links":{"viewPassengerBoardingPass":{"href":"/v1/mobile-air-operations/page/check-in/retrieve-boarding-pass/ABC123","method":"POST","body":{"firstName":"GEORGE","lastName":"BUSH","passengerSearchToken":"REDACTED","travelerID":["REDACTED"]}}}}],"originAirportCode":"MDW","destinationAirportCode":"HOU","flightNumber":"690","hasWifi":true,"travelTime":"2h
+        40m"}],"_links":{"checkInSessionToken":"REDACTED","viewBoardingPassIssuance":{"href":"/v1/mobile-air-operations/page/check-in/retrieve-boarding-pass/ABC123","method":"POST","body":{"firstName":"GEORGE","lastName":"BUSH","passengerSearchToken":"REDACTED","travelerID":["REDACTED"]}},"viewAllBoardingPasses":null,"contactInformation":null}}}'
+    headers:
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Headers:
+      - origin, content-type, accept, authorization, token, User-Agent, X-Forwarded-For,
+        X-User-Experience-ID, X-Request-ID, X-API-Key, X-Account-Number, X-Swa-Region,
+        X-Channel-Id, X-Api-IDToken, true-host
+      Access-Control-Allow-Methods:
+      - GET, POST, PUT, DELETE, OPTIONS, HEAD
+      Access-Control-Allow-Origin:
+      - ''
+      Access-Control-Expose-Headers:
+      - X-User-Experience-ID, X-Request-ID
+      Access-Control-Max-Age:
+      - '1'
+      Cache-Control:
+      - max-age=0, no-cache, no-store
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Pragma:
+      - no-cache
+      Server:
+      - SWA
+      Server-Timing:
+      - cdn-cache; desc=MISS
+      - edge; dur=23
+      - origin; dur=67
+      Strict-Transport-Security:
+      - max-age=60
+      Vary:
+      - Accept-Encoding
+      X-User-Experience-ID:
+      - no-exp-id
+      content-length:
+      - '10965'
+    status:
+      code: 200
+      message: OK
+version: 1

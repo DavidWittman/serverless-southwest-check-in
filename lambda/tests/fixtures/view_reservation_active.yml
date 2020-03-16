@@ -1,0 +1,72 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - SouthwestAndroid/7.2.1 android/10
+    method: GET
+    uri: https://mobile.southwest.com/api/mobile-air-booking/v1/mobile-air-booking/page/view-reservation/ABC123?first-name=George&last-name=Bush
+  response:
+    body:
+      string: '{"viewReservationViewPage":{"dates":{"first":"2020-07-09","second":"2020-07-21"},"messages":null,"changeBlockedMessage":null,"cancelBlockedMessage":null,"checkInIneligibilityReason":null,"greyBoxMessage":{"key":"GREY_BOX_UNAVAILABLE_CHANGE_CANCEL_DENIED","header":null,"body":"Contact
+        1-800-I-FLY-SWA to modify, cancel, or rebook your travel."},"greyBoxPassengerMessage":null,"destinationDescription":"Portland","originAirport":{"name":"Denver","state":"CO","code":"DEN","country":null},"destinationAirport":{"name":"Portland","state":"OR","code":"PDX","country":null},"companion":null,"passengers":[{"name":"George
+        Bush","accountNumber":"REDACTED","passengerReference":"2","hasAnyEarlyBird":false,"hasCompletePassportInfo":false,"checkInIneligibilityReason":null,"isCheckedIn":false,"isCheckInEligible":false,"isUnaccompaniedMinor":false}],"dayOfTravelContactInfo":null,"confirmationNumber":"ABC123","shouldShowAddEarlyBirdButton":false,"bounds":[{"departureStatus":null,"departureStatusType":null,"arrivalStatus":null,"arrivalStatusType":null,"flights":[{"number":"5985","wifiOnBoard":true,"aircraftInfo":{"aircraftType":"Boeing
+        737-700","numberOfSeats":143,"wifiSupported":true}}],"travelTime":"2h 40m","departureDate":"2020-07-09","departureTime":"05:20","departureAirport":{"name":"Denver","state":"CO","code":"DEN","country":null},"arrivalTime":"07:00","arrivalAirport":{"name":"Portland","state":"OR","code":"PDX","country":null},"passengerTypeCounts":{"adult":1,"senior":0},"fareType":"Companion","boundType":"DEPARTING","standbyFlight":null,"stops":[],"isNextDayArrival":false},{"departureStatus":null,"departureStatusType":null,"arrivalStatus":null,"arrivalStatusType":null,"flights":[{"number":"782","wifiOnBoard":true,"aircraftInfo":{"aircraftType":"Boeing
+        737-700","numberOfSeats":143,"wifiSupported":true}}],"travelTime":"2h 25m","departureDate":"2020-07-21","departureTime":"15:55","departureAirport":{"name":"Portland","state":"OR","code":"PDX","country":null},"arrivalTime":"19:20","arrivalAirport":{"name":"Denver","state":"CO","code":"DEN","country":null},"passengerTypeCounts":{"adult":1,"senior":0},"fareType":"Companion","boundType":"RETURNING","standbyFlight":null,"stops":[],"isNextDayArrival":false}],"pageHeader":"DEN
+        - PDX","shareDetails":{"subject":"Southwest Flight 5985 Denver to Portland","confirmationInfo":"Confirmation
+        #: ABC123","passengerInfo":"Passenger names: George Bush","flightInfo":[{"header":"Departing
+        Flight: Thu, Jul 09, 2020","title":"Southwest Flight 5985 Denver to Portland","flightInfo":"Flight
+        #: 5985","departureInfo":"Departs: 05:20 AM DEN","departureDateTime":"1999-08-18T18:50:00.000-05:00","stops":null,"arrivalInfo":"Arrives:
+        07:00 AM PDX","arrivalDateTime":"2020-07-09T07:00:00.000-07:00","travelTime":"Travel
+        time: 2hr 40 mins"},{"header":"Returning Flight: Tue, Jul 21, 2020","title":"Southwest
+        Flight 782 Portland to Denver","flightInfo":"Flight #: 782","departureInfo":"Departs:
+        03:55 PM PDX","departureDateTime":"2099-08-22T07:35:00.000-05:00","stops":null,"arrivalInfo":"Arrives:
+        07:20 PM DEN","arrivalDateTime":"2020-07-21T19:20:00.000-06:00","travelTime":"Travel
+        time: 2hr 25 mins"}]},"viewReservationAnalytics":{"recordLocator":"ABC123","gdsTicketType":null,"isInternational":false,"isSwabiz":false},"hasAnyCancelledFlights":false,"isCheckInEligible":false,"isCheckedIn":false,"isInternational":false,"isDynamicWaiver":false,"isNonRevPnr":false,"isSwabiz":false,"_links":{"checkInSessionToken":null,"earlyBird":null,"change":null,"reaccom":null,"cancel":null,"viewStandbyList":null,"checkIn":null,"contactInformation":null,"viewBoardingPassIssuance":null,"viewBoardingPositions":null,"addCompanion":null,"editPNRPassengers":[{"href":"/v1/mobile-air-booking/page/view-reservation/edit-pnr-passenger/ABC123","method":"GET","query":{"first-name":"George","last-name":"Bush","passenger-reference":"2","passenger-search-token":"REDACTED"}}]},"hasUnaccompaniedMinor":false}}'
+    headers:
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Headers:
+      - origin, content-type, accept, authorization, token, User-Agent, X-Forwarded-For,
+        X-User-Experience-ID, X-Request-ID, X-API-Key, X-Account-Number, X-Swa-Region,
+        X-Channel-Id, X-Api-IDToken, true-host
+      Access-Control-Allow-Methods:
+      - GET, POST, PUT, DELETE, OPTIONS, HEAD
+      Access-Control-Allow-Origin:
+      - ''
+      Access-Control-Expose-Headers:
+      - X-User-Experience-ID, X-Request-ID
+      Access-Control-Max-Age:
+      - '1'
+      Cache-Control:
+      - max-age=0, no-cache, no-store
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Pragma:
+      - no-cache
+      Server:
+      - SWA
+      Server-Timing:
+      - cdn-cache; desc=MISS
+      - edge; dur=28
+      - origin; dur=977
+      Strict-Transport-Security:
+      - max-age=60
+      Vary:
+      - Accept-Encoding
+      X-User-Experience-ID:
+      - no-exp-id
+      content-length:
+      - '4105'
+    status:
+      code: 200
+      message: OK
+version: 1

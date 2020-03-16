@@ -1,0 +1,61 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - SouthwestAndroid/7.2.1 android/10
+    method: GET
+    uri: https://mobile.southwest.com/api/mobile-air-operations/v1/mobile-air-operations/page/check-in/ABC123?first-name=George&last-name=Bush
+  response:
+    body:
+      string: '{"code":404611301,"message":"We can''t find this reservation. Please
+        double-check your information","messageKey":"ERROR__AIR_TRAVEL__RESERVATION_NOT_FOUND","header":null,"httpStatusCode":"NOT_FOUND","requestId":"no-exp-id:REDACTED:unknown","infoList":[]}'
+    headers:
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Headers:
+      - origin, content-type, accept, authorization, token, User-Agent, X-Forwarded-For,
+        X-User-Experience-ID, X-Request-ID, X-API-Key, X-Account-Number, X-Swa-Region,
+        X-Channel-Id, X-Api-IDToken, true-host
+      Access-Control-Allow-Methods:
+      - GET, POST, PUT, DELETE, OPTIONS, HEAD
+      Access-Control-Allow-Origin:
+      - ''
+      Access-Control-Expose-Headers:
+      - X-User-Experience-ID, X-Request-ID
+      Access-Control-Max-Age:
+      - '1'
+      Cache-Control:
+      - max-age=0, no-cache, no-store
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Pragma:
+      - no-cache
+      Server:
+      - SWA
+      Server-Timing:
+      - cdn-cache; desc=MISS
+      - edge; dur=26
+      - origin; dur=433
+      Strict-Transport-Security:
+      - max-age=60
+      Vary:
+      - Accept-Encoding
+      X-API-Gateway:
+      - w11pcacagw43.swacorp.com
+      X-User-Experience-ID:
+      - no-exp-id
+      content-length:
+      - '263'
+    status:
+      code: 404
+      message: Not Found
+version: 1
