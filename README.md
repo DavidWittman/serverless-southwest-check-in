@@ -1,6 +1,6 @@
 # Serverless Southwest Check In
 
-[![Build Status](https://travis-ci.org/DavidWittman/serverless-southwest-check-in.svg?branch=master)](https://travis-ci.org/DavidWittman/serverless-southwest-check-in)
+[![Build Status](https://github.com/DavidWittman/serverless-southwest-check-in/workflows/Unit%20Tests/badge.svg)](https://github.com/DavidWittman/serverless-southwest-check-in/actions)
 
 Serverless Southwest Check In is an email bot which will automatically check you into your Southwest flights. Never sit in a middle seat again!
 

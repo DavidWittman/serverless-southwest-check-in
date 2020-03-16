@@ -1,4 +1,4 @@
-name: Check-In Lambda
+name: Unit Tests
 
 on:
   push:
