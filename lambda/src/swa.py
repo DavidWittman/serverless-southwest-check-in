@@ -22,6 +22,7 @@ def _make_request(method, page, data='', check_status_code=True):
     headers = {
         "User-Agent": USER_AGENT,
         "X-API-Key": API_KEY,
+        "X-Channel-ID": "MWEB",
         "Accept": "application/json"
     }
     method = method.lower()
