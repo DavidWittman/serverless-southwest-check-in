@@ -19,7 +19,8 @@ class TestRequest(unittest.TestCase):
         expected_headers = {
             "User-Agent": "SouthwestAndroid/7.2.1 android/10",
             "Accept": "application/json",
-            "X-API-Key": swa.API_KEY
+            "X-API-Key": swa.API_KEY,
+            "X-Channel-ID": "MWEB"
         }
         expected_url = "https://mobile.southwest.com/api/foo/123456/bar"
         fake_data = ''
@@ -37,7 +38,8 @@ class TestRequest(unittest.TestCase):
             "User-Agent": "SouthwestAndroid/7.2.1 android/10",
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "X-API-Key": swa.API_KEY
+            "X-API-Key": swa.API_KEY,
+            "X-Channel-ID": "MWEB"
         }
         expected_url = "https://mobile.southwest.com/api/foo/123456/bar"
         fake_data = ''
