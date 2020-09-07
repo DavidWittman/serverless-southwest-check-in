@@ -13,7 +13,11 @@ def _generate_email_body(response):
     for flight in response['checkInConfirmationPage']['flights']:
         body += f"\n{flight['originAirportCode']} => {flight['destinationAirportCode']} (#{flight['flightNumber']})\n"
         for passenger in flight['passengers']:
-            body += f"  - {passenger['name']}: {passenger['boardingGroup']}{passenger['boardingPosition']}\n"
+            # Child and infant fares might check in without a boarding group/position
+            if 'boardingGroup' in passenger:
+                body += f"  - {passenger['name']}: {passenger['boardingGroup']}{passenger['boardingPosition']}\n"
+            else:
+                body += f"  - {passenger['name']}\n"
     return body
 
 
