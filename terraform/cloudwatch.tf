@@ -57,3 +57,32 @@ resource "aws_cloudwatch_metric_alarm" "checkin_receive_email_errors" {
   alarm_actions = [aws_sns_topic.admin_notifications.arn]
 }
 
+resource "aws_cloudwatch_metric_alarm" "update_headers_errors" {
+  alarm_name          = "update-headers-error"
+  alarm_description   = "Monitor the ${aws_lambda_function.sw_update_headers.function_name} Lambda for errors"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "Errors"
+  namespace           = "AWS/Lambda"
+  period              = "300"
+  statistic           = "Maximum"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+
+  dimensions = {
+    FunctionName = aws_lambda_function.sw_update_headers.function_name
+  }
+
+  alarm_actions = [aws_sns_topic.admin_notifications.arn]
+}
+
+resource "aws_cloudwatch_event_rule" "every_hour" {
+  name                = "every-hour"
+  description         = "Fires every hour"
+  schedule_expression = "rate(1 hour)"
+}
+
+resource "aws_cloudwatch_event_target" "update_headers" {
+  rule = aws_cloudwatch_event_rule.every_hour.name
+  arn  = aws_lambda_function.sw_update_headers.arn
+}

@@ -40,3 +40,7 @@ POLICY
 
 }
 
+resource "aws_s3_bucket" "layers" {
+  bucket = "${var.domains[0]}-layers"
+  acl    = "private"
+}

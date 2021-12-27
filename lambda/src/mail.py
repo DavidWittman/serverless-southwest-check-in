@@ -237,8 +237,7 @@ def find_name_and_confirmation_number(msg):
         fname = None
 
     if not all([fname, lname, reservation]):
-        raise exceptions.ReservationNotFoundError("Unable to find reservation "
-            "in email id {}".format(msg.message_id))
+        raise exceptions.ReservationNotFoundError("Unable to find reservation in email id {}".format(msg.message_id))
 
     log.info("Passenger: {} {}, Confirmation Number: {}".format(
         fname, lname, reservation))

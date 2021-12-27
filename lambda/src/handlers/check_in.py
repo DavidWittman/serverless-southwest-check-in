@@ -1,7 +1,10 @@
 import logging
-import sys
 
-import swa, exceptions, mail
+import exceptions
+import mail
+import swa
+
+from parameters import get_headers
 
 # Set up logging
 log = logging.getLogger(__name__)
@@ -37,7 +40,7 @@ def main(event, context):
     ))
 
     try:
-        resp = swa.check_in(first_name, last_name, confirmation_number)
+        resp = swa.check_in(first_name, last_name, confirmation_number, get_headers())
         log.info("Checked in successfully!")
         log.debug("Check-in response: {}".format(resp))
     except exceptions.ReservationNotFoundError:
