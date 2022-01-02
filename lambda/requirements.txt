@@ -13,6 +13,7 @@ hpack==4.0.0
 hyperframe==6.0.1
 idna==2.8
 kaitaistruct==0.9
+names==0.3.0
 outcome==1.1.0
 pendulum==2.1.2
 pyasn1==0.4.8

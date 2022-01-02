@@ -5,6 +5,7 @@ import string
 import time
 
 import boto3
+import names
 
 from seleniumwire import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -20,8 +21,8 @@ def main(event, context):
     """
 
     confirmation_number = ''.join(random.choices(string.ascii_uppercase, k=6))
-    first_name = ''.join(random.choices(string.ascii_lowercase, k=random.randrange(4, 10))).capitalize()
-    last_name = ''.join(random.choices(string.ascii_lowercase, k=random.randrange(4, 10))).capitalize()
+    first_name = names.get_first_name()
+    last_name = names.get_last_name()
 
     options = Options()
     options.binary_location = '/opt/headless-chromium'
