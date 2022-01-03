@@ -1,0 +1,69 @@
+{
+  "Comment": "Checks in a Southwest reservation",
+  "StartAt": "ScheduleCheckIns",
+  "States": {
+    "ScheduleCheckIns": {
+      "Type": "Task",
+      "Resource": "${SCHEDULE_CHECK_IN_ARN}",
+      "Next": "MapCheckIns"
+    },
+    "MapCheckIns": {
+      "Type": "Map",
+      "ItemsPath": "$.check_in_times",
+      "MaxConcurrency": 0,
+      "Parameters": {
+        "time.$": "$$.Map.Item.Value",
+        "data.$": "$"
+      },
+      "Iterator": {
+        "StartAt": "WaitUntilCheckIn",
+        "States": {
+          "WaitUntilCheckIn": {
+            "Type": "Wait",
+            "TimestampPath": "$.time",
+            "Next": "CheckIn"
+          },
+          "CheckIn": {
+            "Type": "Task",
+            "Resource": "${CHECK_IN_ARN}",
+            "InputPath": "$.data",
+            "Retry": [
+              {
+                "ErrorEquals": ["SouthwestAPIError"],
+                "IntervalSeconds": 3,
+                "MaxAttempts": 3
+              }
+            ],
+            "Catch": [{
+              "ErrorEquals": ["ReservationNotFoundError"],
+              "Next": "Fail"
+            }, {
+              "ErrorEquals": ["TooManyRequestsError"],
+              "Next": "UpdateHeaders"
+            }, {
+              "ErrorEquals": ["States.ALL"],
+              "Next": "SendFailureNotification",
+              "ResultPath": "$.error"
+            }],
+            "End": true
+          },
+          "UpdateHeaders": {
+            "Type": "Task",
+            "Resource": "${UPDATE_HEADERS_ARN}",
+            "Next": "CheckIn"
+          },
+          "SendFailureNotification": {
+            "Type": "Task",
+            "Resource": "${CHECK_IN_FAILURE_ARN}",
+            "InputPath": "$.data",
+            "End": true
+          },
+          "Fail": {
+            "Type": "Fail"
+          }
+        }
+      },
+      "End": true
+    }
+  }
+}

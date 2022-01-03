@@ -29,6 +29,7 @@ resource "aws_lambda_layer_version" "deps" {
   description         = "Bundled dependencies for Checkin Bot"
   filename            = data.archive_file.vendor.output_path
   layer_name          = "check-in-deps"
+  source_code_hash    = data.archive_file.vendor.output_base64sha256
   compatible_runtimes = ["python3.6", "python3.7"]
 }
 
@@ -39,7 +40,7 @@ resource "aws_lambda_function" "sw_update_headers" {
   handler          = "handlers.update_headers"
   runtime          = "python3.6"
   timeout          = 60
-  memory_size      = 1024
+  memory_size      = 768
   source_code_hash = data.archive_file.src.output_base64sha256
   layers           = [aws_lambda_layer_version.chromedriver.arn, aws_lambda_layer_version.deps.arn]
 }

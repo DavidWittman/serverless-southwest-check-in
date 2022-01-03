@@ -47,6 +47,8 @@ def _make_request(method, page, data='', check_status_code=True, headers=None):
 
         if response.status_code == 404:
             raise exceptions.ReservationNotFoundError()
+        if response.status_code == 429:
+            raise exceptions.TooManyRequestsError()
 
         raise exceptions.SouthwestAPIError("status_code={} msg=\"{}\"".format(
             response.status_code, msg))

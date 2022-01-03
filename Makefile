@@ -22,7 +22,7 @@ test:
 
 lambda/vendor: lambda/requirements.txt
 	sudo docker run --rm -v "$(shell pwd)":/var/task "public.ecr.aws/sam/build-python3.6" /bin/sh -c "pip install -U pip && pip install -r lambda/requirements.txt -t lambda/vendor/python/; exit"
-	sudo chown -R 1000:1000 lambda/vendor
+	sudo chown -R $(shell id -u):$(shell id -g) lambda/vendor
 
 
 $(TF_BUILD_DIR)/chromedriver.zip:

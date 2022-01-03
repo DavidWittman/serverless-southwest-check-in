@@ -76,13 +76,13 @@ resource "aws_cloudwatch_metric_alarm" "update_headers_errors" {
   alarm_actions = [aws_sns_topic.admin_notifications.arn]
 }
 
-resource "aws_cloudwatch_event_rule" "every_hour" {
-  name                = "every-hour"
-  description         = "Fires every hour"
-  schedule_expression = "rate(1 hour)"
+resource "aws_cloudwatch_event_rule" "update_headers" {
+  name                = "sw-update-headers"
+  description         = "Scheduled task to update headers for Southwest API interactions"
+  schedule_expression = "rate(3 hours)"
 }
 
 resource "aws_cloudwatch_event_target" "update_headers" {
-  rule = aws_cloudwatch_event_rule.every_hour.name
+  rule = aws_cloudwatch_event_rule.update_headers.name
   arn  = aws_lambda_function.sw_update_headers.arn
 }
