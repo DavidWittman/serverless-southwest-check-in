@@ -81,7 +81,7 @@ Flight reservation (ABC123) | 25DEC17 | ABC-XYZ | LASTNAME/FIRSTNAME
 
 #### Manually execute Step Function
 
-Invoke the `sw-schedule-check-in` Lambda function via the AWS cli, and pass in your check-in details in JSON as parameters for the event. Here's an example:
+Start an execution of the `sw-check-in` Step Function via the AWS cli, passing in your check-in details in JSON as input. Here's an example:
 
 ```
 STEP_FN_INPUT='{
@@ -96,7 +96,7 @@ aws stepfunctions start-execution \
   --input "$STEP_FN_INPUT"
 ```
 
-The `email` parameter is optional and sets the email address to which your boarding passes will be sent.
+The `email` parameter is optional and sets the email address to which notifications will be sent.
 
 ### Other
 
