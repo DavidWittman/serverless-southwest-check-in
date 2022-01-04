@@ -55,17 +55,16 @@ def main(event, context):
 
     element.submit()
 
-    # give the form time to submit before checking headers
-    time.sleep(10)
+    while len(driver.requests) == 0:
+        print("Waiting for headers...")
+        time.sleep(1)
 
-    headers = {}
-    print(driver.requests[0].headers)
+    headers = {
+        k: v for k, v in driver.requests[0].headers.items()
+        if re.match(r"x-api-key|x-user-experience-id|x-channel-id|^[\w-]+?-\w$", k, re.I)
+    }
 
-    for key, value in driver.requests[0].headers.items():
-        if re.match(r"x-api-key|x-user-experience-id|x-channel-id|^[\w-]+?-\w$", key, re.I):
-            headers[key] = value
-
-    print(f"headers={headers})")
+    print(headers)
 
     if not headers:
         driver.quit()
