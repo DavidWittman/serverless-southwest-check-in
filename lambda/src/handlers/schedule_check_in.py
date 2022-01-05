@@ -1,7 +1,7 @@
-import json
 import logging
 
-import swa, mail
+import mail
+import swa
 
 # Set up logging
 log = logging.getLogger(__name__)

@@ -65,6 +65,15 @@ resource "aws_iam_role_policy" "lambda" {
         "ses:SendRawEmail"
       ],
       "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssm:GetParameter",
+        "ssm:GetParameters",
+        "ssm:PutParameter"
+      ],
+      "Resource": "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/southwest/*"
     }
   ]
 }
