@@ -3,8 +3,6 @@
 # Functions for interacting with the Southwest API
 #
 
-import codecs
-
 from urllib.parse import urlencode
 
 import pendulum
@@ -12,17 +10,18 @@ import requests
 
 import exceptions
 
-USER_AGENT = "SouthwestAndroid/8.11.4 android/12"
-# This is not a secret, but obfuscate it to prevent detection
-API_KEY = codecs.decode("y7kk8389n5on9ro24nr68onq068oq1860osp", "rot13")
+# This is the same User-Agent which update_headers uses
+# TODO: Move to a constants file or something so we're not duplicating
+USER_AGENT = (
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15) AppleWebKit/605.1.15 "
+    "(KHTML, like Gecko) Version/13.0.5 Safari/605.1.15"
+)
 
 
 def _make_request(method, page, data='', check_status_code=True, headers=None):
     url = f"https://mobile.southwest.com/api/{page}"
     _headers = {
         "User-Agent": USER_AGENT,
-        "X-API-Key": API_KEY,
-        "X-Channel-ID": "MWEB",
         "Accept": "application/json"
     }
 
@@ -128,7 +127,7 @@ def check_in(first_name, last_name, confirmation_number, headers):
     page = "mobile-air-operations/v1/mobile-air-operations/page/check-in"
     params = {'first-name': first_name, 'last-name': last_name}
 
-    session = _make_request("get", page + "/" + confirmation_number, params, headers)
+    session = _make_request("get", page + "/" + confirmation_number, params, headers=headers)
     sessionj = session.json()
 
     try:
@@ -138,7 +137,7 @@ def check_in(first_name, last_name, confirmation_number, headers):
         print(sessionj)
         raise exceptions.SouthwestAPIError("Error getting check-in session")
 
-    response = _make_request("post", page, body)
+    response = _make_request("post", page, body, headers=headers)
     if not response.ok:
         raise exceptions.SouthwestAPIError("Error checking in! response={}".format(response))
 
